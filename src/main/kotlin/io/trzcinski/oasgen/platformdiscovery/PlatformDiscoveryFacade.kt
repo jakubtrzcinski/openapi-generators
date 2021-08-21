@@ -1,16 +1,18 @@
 package io.trzcinski.oasgen.platformdiscovery
 
-import java.io.File
+import io.trzcinski.oasgen.filesystem.FilesystemAdapter
 
-class PlatformDiscoveryFacade {
+class PlatformDiscoveryFacade(
+    private val filesystemAdapter: FilesystemAdapter
+    ) {
     val extensions = mapOf(
         "kt" to "kotlin",
         "java" to "java",
         "ts" to "typescript",
         "dart" to "dart",
     )
-    fun discoveryProjectLanguage(path: String): String {
-        return File(path).walkTopDown()
+    fun discoveryProjectLanguage(): String {
+        return filesystemAdapter.walkTopDown()
             .map { it.extension }
             .groupBy { it }
             .mapValues { it.value.size }

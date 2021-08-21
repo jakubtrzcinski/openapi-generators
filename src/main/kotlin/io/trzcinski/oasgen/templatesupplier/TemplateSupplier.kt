@@ -1,7 +1,7 @@
 package io.trzcinski.oasgen.templatesupplier
 
+import com.google.common.io.Resources
 import io.trzcinski.oasgen.templaterenderer.dto.FileTemplate
-import com.google.common.io.Resources;
 import java.io.File
 
 class TemplateSupplier {
@@ -32,10 +32,10 @@ class TemplateSupplier {
         return File(dir+"/oasgen").walk().filter { matching.containsMatchIn(it.name) }.filter { it.isFile }.toList()
     }
 
-    fun fromResources(str: String): FileTemplate {
+    fun fromResources(name: String): FileTemplate {
         return FileTemplate(
-            str.replace(".vm", ""),
-            Resources.getResource("templates/$str").readText()
+            name.substring(name.indexOf("/")+1, name.length),
+            Resources.getResource("templates/$name").readText()
         )
     }
 }

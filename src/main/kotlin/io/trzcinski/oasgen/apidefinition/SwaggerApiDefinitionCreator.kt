@@ -2,8 +2,8 @@ package io.trzcinski.oasgen.apidefinition
 
 import io.swagger.parser.OpenAPIParser
 import io.trzcinski.oasgen.apidefinition.dto.CRUDAggregate
-import io.trzcinski.oasgen.apidefinition.swagger.EndpointAggregator
 import io.trzcinski.oasgen.apidefinition.swagger.CRUDAggregator
+import io.trzcinski.oasgen.apidefinition.swagger.EndpointAggregator
 import io.trzcinski.oasgen.oas.supplier.OASSupplierFactory
 
 class SwaggerApiDefinitionCreator(

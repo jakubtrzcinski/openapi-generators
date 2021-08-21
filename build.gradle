@@ -14,7 +14,7 @@ repositories {
 
 dependencies {
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     api 'org.apache.velocity:velocity:1.7'
     api 'org.apache.velocity:velocity-tools:2.0'
     api 'io.swagger.parser.v3:swagger-parser:2.0.27'

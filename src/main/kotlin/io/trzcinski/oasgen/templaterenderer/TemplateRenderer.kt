@@ -9,7 +9,6 @@ import org.apache.velocity.VelocityContext
 import org.apache.velocity.app.Velocity
 import org.apache.velocity.app.VelocityEngine
 import org.apache.velocity.runtime.resource.loader.StringResourceLoader
-import java.io.File
 import java.io.StringWriter
 
 
@@ -21,23 +20,36 @@ class TemplateRenderer(
     }
 ) {
 
-    fun render(template: FileTemplate, crud: CRUD) : RenderedFile {
+    fun render(
+        template: FileTemplate,
+        crud: CRUD,
+        path: String,
+    ) : RenderedFile {
         val context = VelocityContext().also {
             it.put("crud", crud)
+            it.put("basePath", path)
             it.put("baseUrl", "http://localhost")
         }
+        context.put("path", path+"/"+render(template.path, context))
         return RenderedFile(
             render(template.path, context),
             render(template.content, context)
         )
     }
 
-    fun render(template: FileTemplate, crud: CRUD, dto: ApiModel) : RenderedFile {
+    fun render(
+        template: FileTemplate,
+        crud: CRUD,
+        dto: ApiModel,
+        path: String
+    ) : RenderedFile {
         val context = VelocityContext().also {
             it.put("dto", dto)
             it.put("crud", crud)
+            it.put("basePath", path)
             it.put("baseUrl", "http://localhost")
         }
+        context.put("path", path+"/"+render(template.path, context))
         return RenderedFile(
             render(template.path, context),
             render(template.content, context)

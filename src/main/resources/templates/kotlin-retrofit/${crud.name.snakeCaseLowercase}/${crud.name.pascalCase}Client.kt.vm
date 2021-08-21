@@ -1,0 +1,57 @@
+#* @vtlvariable name="crud" type="io.trzcinski.oasgen.apidefinition.dto.CRUD" *#
+#* @vtlvariable name="path" type="java.lang.String" *#
+#set( $crudClassName = ${crud.name.pascalCase} )
+#set( $package = ${path.replaceAll(${crudClassName}, "").replaceAll("(src/main/kotlin/|/Client.kt)","").replaceAll("/", ".")} )
+#set( $basePackage = ${basePath.replaceAll(${crudClassName}, "").replaceAll("(src/main/kotlin/|/Client.kt)","").replaceAll("/", ".")} )
+package $package
+
+#set ($methodMapping = {
+    "POST" : "POST" ,
+    "GET" : "GET",
+    "PUT" : "PUT",
+    "DELETE" : "DELETE",
+    "OPTIONS" : "OPTIONS",
+    "HEAD" : "HEAD",
+    "PATCH" : "PATCH"
+})
+#set ($typeMapping = {
+    "Integer" : "Int",
+    "String" : "String",
+    "Boolean" : "Boolean",
+    "Object" : "Map<Object, Object>",
+    "Void" : "Void",
+    "DateTime" : "org.joda.time.DateTime"
+})
+#set ($placeMapping = {
+    "body" : "@Body()",
+    "query" : '@Query("%s")',
+    "path" : '@Path("%s")'
+})
+import retrofit2.http.*
+import retrofit2.Call
+
+#foreach(${import} in ${crud.ownImports})
+import ${package}.dto.${import.pascalCase}
+#end
+#foreach(${import} in ${crud.externalImports})
+import ${basePackage}.${import.crud.snakeCaseLowercase}.dto.${import.name.pascalCase}
+#end
+
+interface ${crudClassName}Client {
+    #foreach(${endpoint} in ${crud.endpoints})
+        #set( $returnType = $!{typeMapping.getOrDefault(${endpoint.responseType.pascalCase}, ${endpoint.responseType.pascalCase})} )
+
+        @$!{methodMapping.get($endpoint.method)}("${endpoint.path}")
+        fun ${endpoint.name}(
+
+        #foreach(${param} in ${endpoint.params})
+            #set( $paramType = $!{typeMapping.getOrDefault(${param.type.pascalCase}, ${param.type.pascalCase})} )
+            #set( $paramAdnotation = $!{placeMapping.getOrDefault(${param.place}, ${param.place}).replace("%s", ${param.name})} )
+
+            $!{paramAdnotation} ${param.name}: $paramType#if( $foreach.hasNext ), #end
+    #end
+
+        ): Call<$returnType>
+#end
+}
+

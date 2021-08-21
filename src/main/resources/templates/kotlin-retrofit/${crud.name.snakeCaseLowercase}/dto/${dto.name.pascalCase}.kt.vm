@@ -1,0 +1,23 @@
+#* @vtlvariable name="dto" type="io.trzcinski.oasgen.apidefinition.dto.ApiModel" *#
+#set( $package = ${path.replaceAll(${dto.name.pascalCase}, "").replaceAll("(src/main/kotlin/|/.kt)","").replaceAll("/", ".")} )
+package $package
+#set ($typeMapping = {
+    "Integer" : "Int",
+    "String" : "String",
+    "Boolean" : "Boolean",
+    "Object" : "Map<Object, Object>",
+    "Void" : "Void",
+    "DateTime" : "org.joda.time.DateTime"
+})
+
+#foreach(${import} in ${dto.ownImports})
+import ${package}.${import.crud.snakeCaseLowercase}.dto.${import.name.pascalCase}
+#end
+#foreach(${import} in ${dto.externalImports})
+import ${package}.${import.crud.snakeCaseLowercase}.dto.${import.name.pascalCase}
+#end
+data class ${dto.name.pascalCase}(
+#foreach(${var} in ${dto.properties})
+    val ${var.name}: $!{typeMapping.getOrDefault(${var.type.pascalCase}, ${var.type.pascalCase})}#if(!$var.optional)?#end,
+#end
+)

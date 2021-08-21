@@ -6,8 +6,6 @@ import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.media.*
 import io.trzcinski.oasgen.apidefinition.dto.*
 import io.trzcinski.oasgen.apidefinition.swagger.dto.EndpointAggregate
-import java.lang.Exception
-import java.util.*
 
 class EndpointAggregator {
     fun run(openApi: OpenAPI): EndpointAggregate {

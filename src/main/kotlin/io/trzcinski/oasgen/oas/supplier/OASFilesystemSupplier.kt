@@ -1,7 +1,6 @@
 package io.trzcinski.oasgen.oas.supplier
 
 import java.io.File
-import java.lang.Exception
 
 class OASFilesystemSupplier(
     private val file: String
