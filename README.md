@@ -1,5 +1,7 @@
 # OpenApi Generators
 
+**THIS IS EARLY PREVIEW OF THE GENERATOR, not all features are yet implemented!**
+
 An alternative for standard swagger generator that provides you 
 an elegant code with various customizations with [Apache Velocity](https://github.com/apache/velocity-engine) templates.
 
