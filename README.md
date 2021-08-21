@@ -159,7 +159,7 @@ class Pet {
 <details>
     <summary>/pet/PetClient.kt</summary>
 
-```dart
+```kotlin
 package io.trzcinski.test.pet
 
 import retrofit2.http.*
@@ -216,7 +216,7 @@ interface PetClient {
 <details>
     <summary>/pet/dto/Pet.kt</summary>
 
-```dart
+```kotlin
 package io.trzcinski.test.pet.dto
 
 data class Pet(
@@ -231,6 +231,8 @@ data class Pet(
 
 ```
 </details>
+    
+    
 ### Java FeingClient
 todo
 ### Kotlin FeingClient
