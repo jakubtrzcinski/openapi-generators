@@ -6,6 +6,9 @@ import io.trzcinski.oasgen.apidefinition.SwaggerApiDefinitionCreator
 import io.trzcinski.oasgen.apidefinition.swagger.EndpointAggregator
 import io.trzcinski.oasgen.apidefinition.swagger.CRUDAggregator
 import io.trzcinski.oasgen.oas.supplier.OASSupplierFactory
+import io.trzcinski.oasgen.templaterenderer.TemplateRenderer
+import io.trzcinski.oasgen.templatesupplier.TemplateSupplier
+import io.trzcinski.oasgen.templatewriter.TemplateWriter
 
 
 fun main(args: Array<String>) {
@@ -20,7 +23,12 @@ fun main(args: Array<String>) {
     )
     val app = ConsoleAdapter(
         listOf(
-            GenerateCommand(oasFacade)
+            GenerateCommand(
+                oasFacade,
+                TemplateSupplier(),
+                TemplateWriter(),
+                TemplateRenderer()
+            )
         )
     )
 

@@ -1,6 +1,7 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.4.32'
+    id 'org.jetbrains.kotlin.jvm' version '1.5.20'
     id 'application'
+    id 'java-library'
 }
 
 group = 'me.jakubtrzcinski'
@@ -8,13 +9,23 @@ version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-    implementation 'io.swagger.parser.v3:swagger-parser:2.0.27'
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    api 'org.apache.velocity:velocity:1.7'
+    api 'org.apache.velocity:velocity-tools:2.0'
+    api 'io.swagger.parser.v3:swagger-parser:2.0.27'
+    api ('com.github.KenjiOhtsuka:kotlin-case-changer:0.1.1') {
+        exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
+    }
+
+
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 }
 
 test {
@@ -31,4 +42,13 @@ compileTestKotlin {
 
 application {
     mainClassName = 'MainKt'
+}
+jar {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    manifest {
+        attributes 'Main-Class': 'MainKt'
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
 }

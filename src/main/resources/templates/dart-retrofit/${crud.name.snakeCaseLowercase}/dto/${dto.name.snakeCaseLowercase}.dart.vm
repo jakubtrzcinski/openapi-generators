@@ -1,0 +1,31 @@
+#* @vtlvariable name="dto" type="io.trzcinski.oasgen.apidefinition.dto.ApiModel" *#
+#set ($typeMapping = {
+    "Integer" : "int",
+    "String" : "String",
+    "Boolean" : "bool",
+    "Object" : "Map<Object, Object>",
+    "Void" : "void"
+})
+import 'package:json_annotation/json_annotation.dart';
+
+#foreach(${var} in ${dto.ownCrudImports})
+import '${var.snakeCaseLowercase}.dart';
+#end
+#foreach(${var} in ${dto.externalCrudImports})
+import '../../${var.crud.snakeCaseLowercase}/dto/${var.name.snakeCaseLowercase}.dart';
+#end
+part '${dto.name.snakeCaseLowercase}.g.dart';
+
+@JsonSerializable()
+class ${dto.name.pascalCase} {
+#foreach(${var} in ${dto.properties})
+    $!{typeMapping.getOrDefault(${var.type.pascalCase}, ${var.type.pascalCase})}#if(!$var.optional)?#end ${var.name};
+#end
+    ${dto.name}({
+    #foreach(${var} in ${dto.properties})
+        #if($var.optional) required#end this.${var.name},
+    #end
+    });
+    factory ${dto.name.pascalCase}.fromJson(Map<String, dynamic> json) => _$${dto.name.pascalCase}FromJson(json);
+    Map<String, dynamic> toJson() => _$${dto.name.pascalCase}ToJson(this);
+}

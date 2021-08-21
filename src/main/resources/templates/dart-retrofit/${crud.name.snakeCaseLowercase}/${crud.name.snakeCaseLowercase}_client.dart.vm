@@ -1,0 +1,55 @@
+#* @vtlvariable name="crud" type="io.trzcinski.oasgen.apidefinition.dto.CRUD" *#
+#set( $crudFileName = ${crud.name.snakeCaseLowercase} )
+#set( $crudClassName = ${crud.name.pascalCase} )
+#set ($methodMapping = {
+    "POST" : "POST" ,
+    "GET" : "GET",
+    "PUT" : "PUT",
+    "DELETE" : "DELETE",
+    "OPTIONS" : "OPTIONS",
+    "HEAD" : "HEAD",
+    "PATCH" : "PATCH"
+})
+#set ($typeMapping = {
+    "Integer" : "int",
+    "String" : "String",
+    "Boolean" : "bool",
+    "Object" : "Map<Object, Object>",
+    "Void" : "void"
+})
+#set ($placeMapping = {
+    "body" : "@Body()",
+    "query" : '@Query("%s")',
+    "path" : '@Path("%s")'
+})
+import 'package:dio/dio.dart';
+import 'package:retrofit/retrofit.dart';
+
+#foreach(${import} in ${crud.ownImports})
+import 'dto/${import.snakeCaseLowercase}.dart';
+#end
+#foreach(${import} in ${crud.externalImports})
+import '../../${import.crud.snakeCaseLowercase}/dto/${import.name.snakeCaseLowercase}.dart';
+#end
+
+part '${crudFileName}_client.g.dart';
+@RestApi()
+abstract class  ${crudClassName}Client {
+    factory ${crudClassName}Client(Dio dio, {String baseUrl}) = _${crudClassName}Client;
+    #foreach(${endpoint} in ${crud.endpoints})
+        #set( $returnType = $!{typeMapping.getOrDefault(${endpoint.responseType.pascalCase}, ${endpoint.responseType.pascalCase})} )
+
+        @$!{methodMapping.get($endpoint.method)}("${endpoint.path}")
+        Future<$returnType> ${endpoint.name}(
+
+        #foreach(${param} in ${endpoint.params})
+            #set( $paramType = $!{typeMapping.getOrDefault(${param.type.pascalCase}, ${param.type.pascalCase})} )
+            #set( $paramAdnotation = $!{placeMapping.getOrDefault(${param.place}, ${param.place}).replace("%s", ${param.name})} )
+
+            $!{paramAdnotation} $paramType ${param.name}#if( $foreach.hasNext ), #end
+    #end
+
+        );
+#end
+}
+

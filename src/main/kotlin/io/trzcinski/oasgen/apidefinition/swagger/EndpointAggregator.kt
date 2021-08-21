@@ -4,10 +4,7 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.media.*
-import io.trzcinski.oasgen.apidefinition.dto.Endpoint
-import io.trzcinski.oasgen.apidefinition.dto.ApiModel
-import io.trzcinski.oasgen.apidefinition.dto.Param
-import io.trzcinski.oasgen.apidefinition.dto.Variable
+import io.trzcinski.oasgen.apidefinition.dto.*
 import io.trzcinski.oasgen.apidefinition.swagger.dto.EndpointAggregate
 import java.lang.Exception
 import java.util.*
@@ -44,11 +41,11 @@ class EndpointAggregator {
     fun getDto(name: String, swaggerDto: ObjectSchema): ApiModel {
         val required = swaggerDto.required ?: emptyList()
         return ApiModel(
-            name,
+            ConvertableName(name),
             swaggerDto.properties.map { (key, value) ->
                 val type = getType(value);
                 val collection = value is ArraySchema;
-                Variable(key, getType(value), required.contains(key), collection, isModel(type))
+                Variable(ConvertableName(key), ConvertableName(getType(value)), required.contains(key), collection, isModel(type))
             },
             listOf(),
             listOf()
@@ -61,15 +58,15 @@ class EndpointAggregator {
                 val type = getType(it.schema)
                 Param(
                     it.`in`,
-                    it.name,
-                    type,
+                    ConvertableName(it.name),
+                    ConvertableName(type),
                     isModel(type)
                 )
             }.toMutableList()
 
         val req = getBodyType(item)
         if (req != null) {
-            params.add(0, Param("body", "payload", req, true))
+            params.add(0, Param("body", ConvertableName("payload"), ConvertableName(req), true))
         }
         var name = item.operationId
         if (name.contains("Using")) {
@@ -78,10 +75,10 @@ class EndpointAggregator {
         val response = getResponseType(item);
         return Endpoint(
             path,
-            name,
+            ConvertableName(name),
             method,
             params,
-            response,
+            ConvertableName(response),
             response.isNotEmpty() && isModel(response)
         )
     }

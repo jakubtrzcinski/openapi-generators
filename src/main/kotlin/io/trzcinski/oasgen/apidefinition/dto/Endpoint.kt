@@ -2,9 +2,9 @@ package io.trzcinski.oasgen.apidefinition.dto
 
 data class Endpoint(
     val path: String,
-    val name: String,
+    val name: ConvertableName,
     val method: String,
     val params: List<Param>,
-    val responseType: String,
+    val responseType: ConvertableName,
     val responseTypeIsObject: Boolean
 )
