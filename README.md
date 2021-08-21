@@ -31,15 +31,15 @@ To run generator it's needed to have at least JDK 11 installed on your machine.
 ### Initializarion
 Run in root of your project to download starting script
 ```bash
-$ wget {jklhkh}/oasgen
-$ chmod +x oasgen
+$ wget https://raw.githubusercontent.com/jakubtrzcinski/openapi-generators/master/oasgen.sh
+$ chmod +x oasgen.sh
 ```
 
 To initialize generator in your project simply run following command. 
 
 it will detect language of your project and initialize starting templates for given platform
 ```bash
-$ ./oasgen init
+$ ./oasgen.sh init
 ```
 
 
