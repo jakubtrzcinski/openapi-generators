@@ -57,7 +57,7 @@ $ ./oasgen.sh gen https://petstore.swagger.io/v2/swagger.json packages/shared/li
 ## Examples
 All following examples are generated from https://petstore.swagger.io/ with unmodified templates
 
-### Flutter/Dart and Retrofit
+### Dart Retrofit
 
 <details>
     <summary>/pet/pet_client.dart</summary>
@@ -156,7 +156,83 @@ class Pet {
 
 
 ### Kotlin Retrofit
-todo
+<details>
+    <summary>/pet/PetClient.kt</summary>
+
+```kotlin
+package io.trzcinski.test.pet
+
+import retrofit2.http.*
+import retrofit2.Call
+
+import io.trzcinski.test.pet.dto.Pet
+
+interface PetClient {
+
+        @POST("/pet/{petId}/uploadImage")
+        fun uploadFile(
+             petId: Int
+        ): Call<Void>
+
+        @PUT("/pet")
+        fun updatePet(
+             payload: Pet
+        ): Call<Void>
+
+        @POST("/pet")
+        fun addPet(
+             payload: Pet
+        ): Call<Void>
+
+        @GET("/pet/findByStatus")
+        fun findPetsByStatus(
+             status: String
+        ): Call<Void>
+
+        @GET("/pet/findByTags")
+        fun findPetsByTags(
+             tags: String
+        ): Call<Void>
+
+        @GET("/pet/{petId}")
+        fun getPetById(
+             petId: Int
+        ): Call<Void>
+
+        @POST("/pet/{petId}")
+        fun updatePetWithForm(
+             petId: Int
+        ): Call<Void>
+
+        @DELETE("/pet/{petId}")
+        fun deletePet(
+             api_key: String,
+             petId: Int
+        ): Call<Void>
+}
+```
+</details>
+
+<details>
+    <summary>/pet/dto/Pet.kt</summary>
+
+```kotlin
+package io.trzcinski.test.pet.dto
+
+data class Pet(
+    val id: Int?,
+    val category: Category?,
+    val name: String,
+    val photoUrls: String,
+    val tags: Tag?,
+    val status: String?,
+)
+}
+
+```
+</details>
+    
+    
 ### Java FeingClient
 todo
 ### Kotlin FeingClient
