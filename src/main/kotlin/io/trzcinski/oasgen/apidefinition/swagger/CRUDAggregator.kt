@@ -5,7 +5,7 @@ import io.trzcinski.oasgen.apidefinition.swagger.dto.EndpointAggregate
 import io.trzcinski.oasgen.utils.StringUtils
 
 
-class CRUDAggregator() {
+class CRUDAggregator {
     fun run(endpointAggregate: EndpointAggregate): CRUDAggregate {
         val crudsRaw = getCruds(endpointAggregate)
         val commonDtos = getCommonDtos(crudsRaw, endpointAggregate.apiModels)
@@ -19,7 +19,7 @@ class CRUDAggregator() {
                     .filter { !commonDtoNames.contains(it) }
                     .distinct()
             }.toMutableMap()
-        crudsDtos.put(ConvertableName("Commons"), commonDtos.map { it.name })
+        crudsDtos[ConvertableName("Commons")] = commonDtos.map { it.name }
 
         val cruds = crudsRaw.map {
             val referingDtos = getDTOS(it.value, endpointAggregate.apiModels)
@@ -35,7 +35,7 @@ class CRUDAggregator() {
                 )
             }
 
-            val imports = getImports(it.value, crudsDtos, commons);
+            val imports = getImports(it.value, crudsDtos, commons)
             CRUD(
                 it.key,
                 it.value,
@@ -74,20 +74,20 @@ class CRUDAggregator() {
         for (crud in cruds) {
             for (cDto in crud.value) {
                 if (dto == cDto) {
-                    return ExternalImport(crud.key, dto);
+                    return ExternalImport(crud.key, dto)
                 }
             }
         }
         if (commons.contains(dto)) {
             return ExternalImport(ConvertableName("Commons"), dto)
         }
-        return null;
+        return null
     }
 
     private fun getCruds(endpointAggregate: EndpointAggregate): Map<ConvertableName, ArrayList<Endpoint>> {
         val cruds = HashMap<ConvertableName, ArrayList<Endpoint>>()
         endpointAggregate.endpoints.forEach {
-            var crud = convertableNameFromUrl(it.path)
+            val crud = convertableNameFromUrl(it.path)
             if (!cruds.containsKey(crud)) {
                 cruds[crud] = ArrayList()
             }
@@ -102,7 +102,7 @@ class CRUDAggregator() {
         }
         val path = rawPath.substring(1)
         if(!path.contains("/")){
-            return ConvertableName(path);
+            return ConvertableName(path)
         }
         return ConvertableName(
             path.substring(0, path.indexOf("/")).replace("/", "")
@@ -110,7 +110,7 @@ class CRUDAggregator() {
     }
 
     private fun getCommonDtos(cruds: Map<ConvertableName, ArrayList<Endpoint>>, allApiModels: List<ApiModel>): List<ApiModel> {
-        return allApiModels.filter { cruds.keys.filter { crud -> isFromCrud(it, crud) }.isEmpty() }
+        return allApiModels.filter { cruds.keys.none { crud -> isFromCrud(it, crud) } }
     }
 
     private fun isFromCrud(it: ApiModel, crud: ConvertableName) : Boolean {
@@ -121,7 +121,7 @@ class CRUDAggregator() {
         return endpoints
             .flatMap {
                 listOf(listOf(it.responseType), it.params.map { it.type }).flatten()
-                    .mapNotNull { allApiModels.filter { dto -> dto.name == it }.firstOrNull() }
+                    .mapNotNull { allApiModels.firstOrNull { dto -> dto.name == it } }
             }
     }
 
@@ -130,20 +130,6 @@ class CRUDAggregator() {
         val ret = apiModels.filter { types.contains(it.name) }.flatMap { expand(it, apiModels) }.toMutableList()
         ret.add(apiModel)
         return ret
-    }
-
-    private fun getCrudName(rawPath: String): String {
-        val path = if (rawPath.startsWith("/")) rawPath.substring(1) else rawPath
-        if (path.isBlank()) return "Root"
-        if (path == "/") return "Root"
-
-
-        if (!path.contains("/")) {
-            return StringUtils.kebabToCamel(path).capitalize()
-        }
-        return StringUtils.kebabToCamel(
-            path.substring(0, path.indexOf("/")).capitalize()
-        )
     }
 
 }

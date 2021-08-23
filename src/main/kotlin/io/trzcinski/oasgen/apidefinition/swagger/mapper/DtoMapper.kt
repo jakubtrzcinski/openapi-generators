@@ -6,13 +6,13 @@ import io.trzcinski.oasgen.apidefinition.dto.ConvertableName
 import io.trzcinski.oasgen.apidefinition.dto.Variable
 
 class DtoMapper {
-    fun getDto(name: String, swaggerDto: ObjectSchema): ApiModel {
+    private fun getDto(name: String, swaggerDto: ObjectSchema): ApiModel {
         val required = swaggerDto.required ?: emptyList()
         return ApiModel(
             ConvertableName(name),
             swaggerDto.properties.map { (key, value) ->
-                val type = getType(value);
-                val collection = value is ArraySchema;
+                val type = getType(value)
+                val collection = value is ArraySchema
                 Variable(ConvertableName(key), ConvertableName(getType(value)), required.contains(key), collection, isModel(type))
             },
             listOf(),
@@ -29,7 +29,7 @@ class DtoMapper {
     }
 
     fun getType(schema: Schema<Any>?): String {
-        if (schema == null) return "void";
+        if (schema == null) return "void"
         if (schema.`$ref` != null) {
             return schema.`$ref`.replace("#/components/schemas/", "")
 

@@ -5,7 +5,7 @@ import io.trzcinski.oasgen.filesystem.FilesystemAdapter
 class PlatformDiscoveryFacade(
     private val filesystemAdapter: FilesystemAdapter
     ) {
-    val extensions = mapOf(
+    private val extensions = mapOf(
         "kt" to "kotlin",
         "java" to "java",
         "ts" to "typescript",

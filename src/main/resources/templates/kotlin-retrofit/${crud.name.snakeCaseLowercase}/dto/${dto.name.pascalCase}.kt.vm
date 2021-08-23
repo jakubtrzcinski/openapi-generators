@@ -12,10 +12,9 @@ package $package
 })
 
 #foreach(${import} in ${dto.ownCrudImports})
-import ${package}.dto.${import.name.pascalCase}
+${import.name.pascalCase}
 #end
-#foreach(${import} in ${dto.externalCrudImports})
-import ${basePackage}.${import.crud.snakeCaseLowercase}.dto.${import.name.pascalCase}
+#foreach(${import} in ${dto.externalCrudImports})${import.name.pascalCase}
 #end
 
 data class ${dto.name.pascalCase}(

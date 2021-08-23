@@ -58,7 +58,7 @@ class TemplateRenderer(
 
 
     private fun render(rawTemplate: String, context: VelocityContext): String {
-        StringResourceLoader.getRepository().putStringResource(rawTemplate.hashCode().toString(), rawTemplate);
+        StringResourceLoader.getRepository().putStringResource(rawTemplate.hashCode().toString(), rawTemplate)
         val t: Template = velocityEngine.getTemplate(rawTemplate.hashCode().toString())
         val writer = StringWriter()
         t.merge(context, writer)

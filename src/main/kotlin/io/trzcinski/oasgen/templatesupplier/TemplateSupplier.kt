@@ -28,8 +28,8 @@ class TemplateSupplier {
             )
         }
     }
-    fun findInDirMatching(dir: String, matching: Regex) : List<File> {
-        return File(dir+"/oasgen").walk().filter { matching.containsMatchIn(it.name) }.filter { it.isFile }.toList()
+    private fun findInDirMatching(dir: String, matching: Regex) : List<File> {
+        return File("$dir/oasgen").walk().filter { matching.containsMatchIn(it.name) }.filter { it.isFile }.toList()
     }
 
     fun fromResources(name: String): FileTemplate {

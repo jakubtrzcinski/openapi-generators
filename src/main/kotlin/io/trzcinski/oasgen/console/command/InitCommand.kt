@@ -39,6 +39,6 @@ class InitCommand(
                 templateSupplier.fromResources("kotlin-retrofit/\${crud.name.snakeCaseLowercase}/\${crud.name.pascalCase}Client.kt.vm"),
             )
         }
-        throw RuntimeException("lang $lang not supported");
+        throw RuntimeException("lang $lang not supported")
     }
 }

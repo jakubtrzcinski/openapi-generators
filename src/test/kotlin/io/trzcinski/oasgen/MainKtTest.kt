@@ -1,6 +1,5 @@
 package io.trzcinski.oasgen
 
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.opentest4j.AssertionFailedError
 import java.io.File
@@ -51,8 +50,8 @@ internal class MainKtTest {
                 val fileInOther: Path = other.resolve(relativize)
                 val otherBytes: ByteArray = Files.readAllBytes(fileInOther)
                 val theseBytes: ByteArray = Files.readAllBytes(file)
-                if (!Arrays.equals(otherBytes, theseBytes)) {
-                    throw AssertionFailedError(file.toString() + " is not equal to " + fileInOther)
+                if (!otherBytes.contentEquals(theseBytes)) {
+                    throw AssertionFailedError("$file is not equal to $fileInOther")
                 }
                 return result
             }

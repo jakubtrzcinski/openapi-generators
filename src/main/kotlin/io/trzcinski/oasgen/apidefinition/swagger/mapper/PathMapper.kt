@@ -7,10 +7,10 @@ import io.trzcinski.oasgen.apidefinition.dto.Endpoint
 import io.trzcinski.oasgen.apidefinition.dto.Param
 
 class PathMapper(
-    val dtoMapper: DtoMapper
+    private val dtoMapper: DtoMapper
 ) {
     fun mapPathItems(path: String, item: PathItem): List<Endpoint> {
-        val endpoints: ArrayList<Endpoint> = ArrayList(8);
+        val endpoints: ArrayList<Endpoint> = ArrayList(8)
 
         if (item.get != null) endpoints.add(mapPathItems(path, "GET", item.get))
         if (item.put != null) endpoints.add(mapPathItems(path, "PUT", item.put))
@@ -20,11 +20,11 @@ class PathMapper(
         if (item.head != null) endpoints.add(mapPathItems(path, "HEAD", item.head))
         if (item.patch != null) endpoints.add(mapPathItems(path, "PATCH", item.patch))
 
-        return endpoints;
+        return endpoints
 
     }
 
-    fun mapPathItems(path: String, method: String, item: Operation): Endpoint {
+    private fun mapPathItems(path: String, method: String, item: Operation): Endpoint {
         val params: MutableList<Param> = if (item.parameters == null) mutableListOf() else item.parameters
             .map {
                 val type = dtoMapper.getType(it.schema)
@@ -42,9 +42,9 @@ class PathMapper(
         }
         var name = item.operationId
         if (name.contains("Using")) {
-            name = name.substring(0, name.indexOf("Using"));
+            name = name.substring(0, name.indexOf("Using"))
         }
-        val response = getResponseType(item);
+        val response = getResponseType(item)
         return Endpoint(
             path,
             ConvertableName(name),
@@ -73,7 +73,7 @@ class PathMapper(
             if (!operation.responses.containsKey("200")) {
                 return "void"
             }
-            val schema = operation.responses.get("200")!!.content["*/*"]!!.schema
+            val schema = operation.responses["200"]!!.content["*/*"]!!.schema
 
             return dtoMapper.getType(schema)
 

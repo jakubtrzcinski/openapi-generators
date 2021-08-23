@@ -6,8 +6,8 @@ import io.trzcinski.oasgen.apidefinition.swagger.mapper.DtoMapper
 import io.trzcinski.oasgen.apidefinition.swagger.mapper.PathMapper
 
 class EndpointAggregator(
-    val pathMapper: PathMapper,
-    val dtoMapper: DtoMapper
+    private val pathMapper: PathMapper,
+    private val dtoMapper: DtoMapper
 ) {
     fun run(openApi: OpenAPI): EndpointAggregate {
         val endpoints = openApi.paths.flatMap {

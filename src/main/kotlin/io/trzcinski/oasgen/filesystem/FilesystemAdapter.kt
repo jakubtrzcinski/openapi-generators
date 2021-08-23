@@ -2,7 +2,7 @@ package io.trzcinski.oasgen.filesystem
 
 import java.io.File
 
-class FilesystemAdapter() {
+class FilesystemAdapter {
 
     fun mkdirs(dir: String){
         File(relativize(dir)).mkdirs()
@@ -19,9 +19,9 @@ class FilesystemAdapter() {
 
     private fun relativize(path: String) : String {
         if(path.startsWith("/")){
-            return System.getProperty("user.dir")+path;
+            return System.getProperty("user.dir")+path
         }
-        return System.getProperty("user.dir")+"/"+path;
+        return System.getProperty("user.dir")+"/"+path
     }
 
     fun walkTopDown(): FileTreeWalk {

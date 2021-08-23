@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions.*
 
 internal class ConvertableNameTest {
 
-    val convertableName = ConvertableName("PetStore")
+    private val convertableName = ConvertableName("PetStore")
 
     @Test
     fun getKebabCaseLowercased() {
