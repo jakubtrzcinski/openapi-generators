@@ -60,8 +60,8 @@ class CRUDAggregator(
         return ApiModel(
             apiModel.name,
             apiModel.properties,
-            imports.filter { it.crud == crud }.map { it.name },
-            imports.filter { it.crud != crud },
+            imports.filter { it.crud.value == crud.value  }.map { it.name },
+            imports.filter { it.crud.value  != crud.value  },
         )
     }
 

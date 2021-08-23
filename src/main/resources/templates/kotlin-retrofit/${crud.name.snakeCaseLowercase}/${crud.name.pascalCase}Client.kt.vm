@@ -44,14 +44,13 @@ interface ${crudClassName}Client {
         @$!{methodMapping.get($endpoint.method)}("${endpoint.path}")
         fun ${endpoint.name}(
 
-        #foreach(${param} in ${endpoint.params})
-            #set( $paramType = $!{typeMapping.getOrDefault(${param.type.pascalCase}, ${param.type.pascalCase})} )
-            #set( $paramAdnotation = $!{placeMapping.getOrDefault(${param.place}, ${param.place}).replace("%s", ${param.name})} )
+            #foreach(${param} in ${endpoint.params})
+                #set( $paramType = $!{typeMapping.getOrDefault(${param.type.pascalCase}, ${param.type.pascalCase})} )
+                #set( $paramAdnotation = $!{placeMapping.getOrDefault(${param.place}, ${param.place}).replace("%s", ${param.name})} )
 
-            $!{paramAdnotation} ${param.name}: $paramType#if( $foreach.hasNext ), #end
-    #end
+                $!{paramAdnotation} ${param.name}: $paramType#if( $foreach.hasNext ), #end
+            #end
 
         ): Call<$returnType>
-#end
+    #end
 }
-
