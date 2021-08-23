@@ -5,9 +5,7 @@ import io.trzcinski.oasgen.apidefinition.swagger.dto.EndpointAggregate
 import io.trzcinski.oasgen.utils.StringUtils
 
 
-class CRUDAggregator(
-    private val pathPrefix: String
-) {
+class CRUDAggregator() {
     fun run(endpointAggregate: EndpointAggregate): CRUDAggregate {
         val crudsRaw = getCruds(endpointAggregate)
         val commonDtos = getCommonDtos(crudsRaw, endpointAggregate.apiModels)

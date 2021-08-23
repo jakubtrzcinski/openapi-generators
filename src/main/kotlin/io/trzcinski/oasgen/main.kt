@@ -1,8 +1,12 @@
+package io.trzcinski.oasgen
+
 import io.swagger.parser.OpenAPIParser
 import io.trzcinski.oasgen.apidefinition.ApiDefinitionFacade
 import io.trzcinski.oasgen.apidefinition.SwaggerApiDefinitionCreator
 import io.trzcinski.oasgen.apidefinition.swagger.CRUDAggregator
 import io.trzcinski.oasgen.apidefinition.swagger.EndpointAggregator
+import io.trzcinski.oasgen.apidefinition.swagger.mapper.DtoMapper
+import io.trzcinski.oasgen.apidefinition.swagger.mapper.PathMapper
 import io.trzcinski.oasgen.console.ConsoleAdapter
 import io.trzcinski.oasgen.console.command.GenerateCommand
 import io.trzcinski.oasgen.console.command.InitCommand
@@ -14,12 +18,13 @@ import io.trzcinski.oasgen.templatesupplier.TemplateSupplier
 
 fun main(args: Array<String>) {
 
+    val dtoMapper = DtoMapper()
     val oasFacade = ApiDefinitionFacade(
         SwaggerApiDefinitionCreator(
             OASSupplierFactory(),
-            EndpointAggregator(),
+            EndpointAggregator(PathMapper(dtoMapper), dtoMapper),
             OpenAPIParser(),
-            CRUDAggregator("")
+            CRUDAggregator()
         )
     )
     val templateSupplier = TemplateSupplier()

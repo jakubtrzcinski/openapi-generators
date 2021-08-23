@@ -12,6 +12,9 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
+sourceCompatibility = 11
+targetCompatibility = 11
+
 dependencies {
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
