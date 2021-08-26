@@ -76,44 +76,42 @@ abstract class  PetClient {
 
   @POST("/pet/{petId}/uploadImage")
   Future<ApiResponse> uploadFile(
-      int petId
-      );
+      @Path("petId") int petId
+  );
 
   @PUT("/pet")
   Future<void> updatePet(
-      Pet payload
-      );
+  );
 
   @POST("/pet")
   Future<void> addPet(
-      Pet payload
-      );
+  );
 
   @GET("/pet/findByStatus")
   Future<List<Pet>> findPetsByStatus(
-      List<String> status
-      );
+      @Query("status") List<String> status
+  );
 
   @GET("/pet/findByTags")
   Future<List<Pet>> findPetsByTags(
-      List<String> tags
-      );
+      @Query("tags") List<String> tags
+  );
 
   @GET("/pet/{petId}")
   Future<Pet> getPetById(
-      int petId
-      );
+      @Path("petId") int petId
+  );
 
   @POST("/pet/{petId}")
   Future<void> updatePetWithForm(
-      int petId
-      );
+      @Path("petId") int petId
+  );
 
   @DELETE("/pet/{petId}")
   Future<void> deletePet(
-      String api_key,
-      int petId
-      );
+      @Header("api_key") String api_key,
+      @Path("petId") int petId
+  );
 }
 ```
 </details>
