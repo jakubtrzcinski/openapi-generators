@@ -3,6 +3,7 @@ package io.trzcinski.oasgen.apidefinition.swagger.mapper
 import io.swagger.v3.oas.models.media.*
 import io.trzcinski.oasgen.apidefinition.dto.ApiModel
 import io.trzcinski.oasgen.apidefinition.dto.ConvertableName
+import io.trzcinski.oasgen.apidefinition.dto.Type
 import io.trzcinski.oasgen.apidefinition.dto.Variable
 
 class DtoMapper {
@@ -11,9 +12,7 @@ class DtoMapper {
         return ApiModel(
             ConvertableName(name),
             swaggerDto.properties.map { (key, value) ->
-                val type = getType(value)
-                val collection = value is ArraySchema
-                Variable(ConvertableName(key), ConvertableName(getType(value)), required.contains(key), collection, isModel(type))
+                Variable(ConvertableName(key), getType(value, !required.contains(key)))
             },
             listOf(),
             listOf()
@@ -28,23 +27,25 @@ class DtoMapper {
 
     }
 
-    fun getType(schema: Schema<Any>?): String {
-        if (schema == null) return "void"
+    fun getType(schema: Schema<Any>?, optional: Boolean): Type {
+        if (schema == null){
+            return Type(ConvertableName("Void"), optional, false)
+        }
         if (schema.`$ref` != null) {
-            return schema.`$ref`.replace("#/components/schemas/", "")
+            return Type(ConvertableName(schema.`$ref`.replace("#/components/schemas/", "")), optional, false)
 
         }
         if (schema is DateTimeSchema) {
-            return "DateTime"
+            return Type(ConvertableName("DateTime"), optional, false)
         }
         if (schema is DateSchema) {
-            return "DateTime"
+            return Type(ConvertableName("Date"), optional, false)
         }
         if (schema is ArraySchema) {
-            return getType(schema.items as Schema<Any>)
+            return getType(schema.items as Schema<Any>, false).copy(list = true, optional = optional)
         }
 
-        return schema.type
+        return Type(ConvertableName(schema.type), optional, false)
     }
 
 

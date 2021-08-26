@@ -20,7 +20,8 @@
 #set ($placeMapping = {
     "body" : "@Body()",
     "query" : '@Query("%s")',
-    "path" : '@Path("%s")'
+    "path" : '@Path("%s")',
+    "header" : '@Header("%s")'
 })
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
@@ -37,13 +38,15 @@ part '${crudFileName}_client.g.dart';
 abstract class  ${crudClassName}Client {
     factory ${crudClassName}Client(Dio dio, {String baseUrl}) = _${crudClassName}Client;
     #foreach(${endpoint} in ${crud.endpoints})
-        #set( $returnType = $!{typeMapping.getOrDefault(${endpoint.responseType.pascalCase}, ${endpoint.responseType.pascalCase})} )
+        #set( $returnType = $!{typeMapping.getOrDefault(${endpoint.responseType.name.pascalCase}, ${endpoint.responseType.name.pascalCase})} )
+        #if($endpoint.responseType.list)#set( $returnType = "List<$returnType>" )#end
 
         @$!{methodMapping.get($endpoint.method)}("${endpoint.path}")
         Future<$returnType> ${endpoint.name}(
 
         #foreach(${param} in ${endpoint.params})
-            #set( $paramType = $!{typeMapping.getOrDefault(${param.type.pascalCase}, ${param.type.pascalCase})} )
+            #set( $paramType = $!{typeMapping.getOrDefault(${param.type.name.pascalCase}, ${param.type.name.pascalCase})} )
+            #if($param.type.list)#set( $paramType = "List<$paramType>" )#end
             #set( $paramAdnotation = $!{placeMapping.getOrDefault(${param.place}, ${param.place}).replace("%s", ${param.name})} )
 
             $!{paramAdnotation} $paramType ${param.name}#if( $foreach.hasNext ), #end

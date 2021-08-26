@@ -25,7 +25,8 @@ package $package
 #set ($placeMapping = {
     "body" : "@Body()",
     "query" : '@Query("%s")',
-    "path" : '@Path("%s")'
+    "path" : '@Path("%s")',
+    "header" : '@Header("%s")'
 })
 import retrofit2.http.*
 import retrofit2.Call
@@ -38,19 +39,25 @@ import ${basePackage}.${import.crud.snakeCaseLowercase}.dto.${import.name.pascal
 #end
 
 interface ${crudClassName}Client {
-    #foreach(${endpoint} in ${crud.endpoints})
-        #set( $returnType = $!{typeMapping.getOrDefault(${endpoint.responseType.pascalCase}, ${endpoint.responseType.pascalCase})} )
+#foreach(${endpoint} in ${crud.endpoints})
+    #set( $returnType = $!{typeMapping.getOrDefault(${endpoint.responseType.name.pascalCase}, ${endpoint.responseType.name.pascalCase})} )
+    #if($endpoint.responseType.list)#set( $returnType = "List<$returnType>" )#end
 
-        @$!{methodMapping.get($endpoint.method)}("${endpoint.path}")
-        fun ${endpoint.name}(
+    @$!{methodMapping.get($endpoint.method)}("${endpoint.path}")
+    fun ${endpoint.name}(
 
-            #foreach(${param} in ${endpoint.params})
-                #set( $paramType = $!{typeMapping.getOrDefault(${param.type.pascalCase}, ${param.type.pascalCase})} )
-                #set( $paramAdnotation = $!{placeMapping.getOrDefault(${param.place}, ${param.place}).replace("%s", ${param.name})} )
+    #foreach(${param} in ${endpoint.params})
+        #set( $paramType = $!{typeMapping.getOrDefault(${param.type.name.pascalCase}, ${param.type.name.pascalCase})} )
+        #if($param.type.list)
+        #set( $paramType = "List<$paramType>" )
+        #end
+        #set( $paramAdnotation = $!{placeMapping.getOrDefault(${param.place}, ${param.place}).replace("%s", ${param.alias})} )
 
-                $!{paramAdnotation} ${param.name}: $paramType#if( $foreach.hasNext ), #end
-            #end
-
-        ): Call<$returnType>
+        $paramAdnotation ${param.name}: $paramType#if( $foreach.hasNext ), #end
     #end
+
+    ): Call<$returnType>
+
+
+#end
 }

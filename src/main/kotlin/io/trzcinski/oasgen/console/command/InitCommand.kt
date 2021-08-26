@@ -20,7 +20,7 @@ class InitCommand(
             return
         }
         filesystemAdapter.mkdirs("oasgen")
-        val lang = discoveryFacade.discoveryProjectLanguage()
+        val lang = if(args.isNotEmpty()) args[0] else discoveryFacade.discoveryProjectLanguage()
         println("Detected platform: $lang")
         startingTemplates(lang).forEach {
             filesystemAdapter.save("oasgen/"+it.path, it.content)

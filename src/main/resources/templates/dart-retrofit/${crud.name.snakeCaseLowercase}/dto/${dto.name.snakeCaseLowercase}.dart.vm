@@ -19,11 +19,11 @@ part '${dto.name.snakeCaseLowercase}.g.dart';
 @JsonSerializable()
 class ${dto.name.pascalCase} {
 #foreach(${var} in ${dto.properties})
-    $!{typeMapping.getOrDefault(${var.type.pascalCase}, ${var.type.pascalCase})}#if(!$var.optional)?#end ${var.name};
+    $!{typeMapping.getOrDefault(${var.type.name.pascalCase}, ${var.type.name.pascalCase})}#if($var.type.optional)?#end ${var.name};
 #end
     ${dto.name}({
     #foreach(${var} in ${dto.properties})
-        #if($var.optional) required#end this.${var.name},
+        #if(!$var.type.optional) required#end this.${var.name},
     #end
     });
     factory ${dto.name.pascalCase}.fromJson(Map<String, dynamic> json) => _$${dto.name.pascalCase}FromJson(json);

@@ -66,53 +66,54 @@ All following examples are generated from https://petstore.swagger.io/ with unmo
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
 
-import 'model/pet.dart';
+import 'dto/pet.dart';
+import '../../commons/dto/api_response.dart';
 
 part 'pet_client.g.dart';
 @RestApi()
-abstract class PetClient {
-factory PetClient(Dio dio, {String baseUrl}) = _PetClient;
+abstract class  PetClient {
+  factory PetClient(Dio dio, {String baseUrl}) = _PetClient;
 
-    @POST("/pet/{petId}/uploadImage")
-    Future<void> uploadFile(
-             int petId
-    );
+  @POST("/pet/{petId}/uploadImage")
+  Future<ApiResponse> uploadFile(
+      int petId
+      );
 
-    @PUT("/pet")
-    Future<void> updatePet(
-             Pet payload
-    );
+  @PUT("/pet")
+  Future<void> updatePet(
+      Pet payload
+      );
 
-    @POST("/pet")
-    Future<void> addPet(
-             Pet payload
-    );
+  @POST("/pet")
+  Future<void> addPet(
+      Pet payload
+      );
 
-    @GET("/pet/findByStatus")
-    Future<void> findPetsByStatus(
-             String status
-    );
+  @GET("/pet/findByStatus")
+  Future<List<Pet>> findPetsByStatus(
+      List<String> status
+      );
 
-    @GET("/pet/findByTags")
-    Future<void> findPetsByTags(
-             String tags
-    );
+  @GET("/pet/findByTags")
+  Future<List<Pet>> findPetsByTags(
+      List<String> tags
+      );
 
-    @GET("/pet/{petId}")
-    Future<void> getPetById(
-             int petId
-    );
+  @GET("/pet/{petId}")
+  Future<Pet> getPetById(
+      int petId
+      );
 
-    @POST("/pet/{petId}")
-    Future<void> updatePetWithForm(
-             int petId
-    );
+  @POST("/pet/{petId}")
+  Future<void> updatePetWithForm(
+      int petId
+      );
 
-    @DELETE("/pet/{petId}")
-    Future<void> deletePet(
-             String api_key,
-             int petId
-    );
+  @DELETE("/pet/{petId}")
+  Future<void> deletePet(
+      String api_key,
+      int petId
+      );
 }
 ```
 </details>
@@ -123,9 +124,8 @@ factory PetClient(Dio dio, {String baseUrl}) = _PetClient;
 ```dart
 import 'package:json_annotation/json_annotation.dart';
 
-import '../../commons/model/category.dart';
-import '../../commons/model/tag.dart';
-
+import '../../commons/dto/category.dart';
+import '../../commons/dto/tag.dart';
 part 'pet.g.dart';
 
 @JsonSerializable()
@@ -136,7 +136,6 @@ class Pet {
   String photoUrls;
   Tag? tags;
   String? status;
-
   Pet({
     this.id,
     this.category,
@@ -145,9 +144,7 @@ class Pet {
     this.tags,
     this.status,
   });
-
   factory Pet.fromJson(Map<String, dynamic> json) => _$PetFromJson(json);
-
   Map<String, dynamic> toJson() => _$PetToJson(this);
 }
 
@@ -160,55 +157,56 @@ class Pet {
     <summary>/pet/PetClient.kt</summary>
 
 ```kotlin
-package io.trzcinski.test.pet
+package out.io.trzcinski.test.pet
 
 import retrofit2.http.*
 import retrofit2.Call
 
-import io.trzcinski.test.pet.dto.Pet
+import out.io.trzcinski.test.pet.dto.Pet
+import out.io.trzcinski.test.commons.dto.ApiResponse
 
 interface PetClient {
 
-        @POST("/pet/{petId}/uploadImage")
-        fun uploadFile(
-             petId: Int
-        ): Call<Void>
+    @POST("/pet/{petId}/uploadImage")
+    fun uploadFile(
+        @Path("petId") petId: Int
+    ): Call<ApiResponse>
 
-        @PUT("/pet")
-        fun updatePet(
-             payload: Pet
-        ): Call<Void>
+    @PUT("/pet")
+    fun updatePet(
+        @Body() payload: Pet
+    ): Call<Void>
 
-        @POST("/pet")
-        fun addPet(
-             payload: Pet
-        ): Call<Void>
+    @POST("/pet")
+    fun addPet(
+        @Body() payload: Pet
+    ): Call<Void>
 
-        @GET("/pet/findByStatus")
-        fun findPetsByStatus(
-             status: String
-        ): Call<Void>
+    @GET("/pet/findByStatus")
+    fun findPetsByStatus(
+        @Query("status") status: List<String>
+    ): Call<List<Pet>>
 
-        @GET("/pet/findByTags")
-        fun findPetsByTags(
-             tags: String
-        ): Call<Void>
+    @GET("/pet/findByTags")
+    fun findPetsByTags(
+        @Query("tags") tags: List<String>
+    ): Call<List<Pet>>
 
-        @GET("/pet/{petId}")
-        fun getPetById(
-             petId: Int
-        ): Call<Void>
+    @GET("/pet/{petId}")
+    fun getPetById(
+        @Path("petId") petId: Int
+    ): Call<Pet>
 
-        @POST("/pet/{petId}")
-        fun updatePetWithForm(
-             petId: Int
-        ): Call<Void>
+    @POST("/pet/{petId}")
+    fun updatePetWithForm(
+        @Path("petId") petId: Int
+    ): Call<Void>
 
-        @DELETE("/pet/{petId}")
-        fun deletePet(
-             api_key: String,
-             petId: Int
-        ): Call<Void>
+    @DELETE("/pet/{petId}")
+    fun deletePet(
+        @Header("api_key") api_key: String,
+        @Path("petId") petId: Int
+    ): Call<Void>
 }
 ```
 </details>
@@ -217,17 +215,19 @@ interface PetClient {
     <summary>/pet/dto/Pet.kt</summary>
 
 ```kotlin
-package io.trzcinski.test.pet.dto
+package out.io.trzcinski.test.pet.dto
+
+import out.io.trzcinski.test.commons.dto.Category
+import out.io.trzcinski.test.commons.dto.Tag
 
 data class Pet(
     val id: Int?,
     val category: Category?,
     val name: String,
-    val photoUrls: String,
-    val tags: Tag?,
+    val photoUrls: List<String>,
+    val tags: List<Tag>?,
     val status: String?,
 )
-}
 
 ```
 </details>

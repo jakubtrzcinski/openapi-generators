@@ -70,16 +70,16 @@ class CRUDAggregator {
     }
 
 
-    private fun findReference(dto: ConvertableName, cruds: Map<ConvertableName, List<ConvertableName>>, commons: List<ConvertableName>): ExternalImport? {
+    private fun findReference(dto: Type, cruds: Map<ConvertableName, List<ConvertableName>>, commons: List<ConvertableName>): ExternalImport? {
         for (crud in cruds) {
             for (cDto in crud.value) {
-                if (dto == cDto) {
-                    return ExternalImport(crud.key, dto)
+                if (dto.name == cDto) {
+                    return ExternalImport(crud.key, dto.name)
                 }
             }
         }
-        if (commons.contains(dto)) {
-            return ExternalImport(ConvertableName("Commons"), dto)
+        if (commons.contains(dto.name)) {
+            return ExternalImport(ConvertableName("Commons"), dto.name)
         }
         return null
     }
@@ -121,12 +121,12 @@ class CRUDAggregator {
         return endpoints
             .flatMap {
                 listOf(listOf(it.responseType), it.params.map { it.type }).flatten()
-                    .mapNotNull { allApiModels.firstOrNull { dto -> dto.name == it } }
+                    .mapNotNull { allApiModels.firstOrNull { dto -> dto.name == it.name } }
             }
     }
 
     private fun expand(apiModel: ApiModel, apiModels: List<ApiModel>): List<ApiModel> {
-        val types = apiModel.properties.map { it.type }
+        val types = apiModel.properties.map { it.type.name }
         val ret = apiModels.filter { types.contains(it.name) }.flatMap { expand(it, apiModels) }.toMutableList()
         ret.add(apiModel)
         return ret
