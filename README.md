@@ -9,13 +9,9 @@ an elegant code with various customizations with [Apache Velocity](https://githu
 
 ### Java
 * FeingClient
-* Retrofit
-* RestTemplate
 
 ### Kotlin
-* FeingClient
 * Retrofit
-* RestTemplate
 
 ### Flutter / Dart
 * Retrofit
