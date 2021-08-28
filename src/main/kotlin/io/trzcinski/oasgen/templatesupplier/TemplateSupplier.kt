@@ -1,15 +1,19 @@
 package io.trzcinski.oasgen.templatesupplier
 
 import com.google.common.io.Resources
+import io.trzcinski.oasgen.filesystem.FilesystemAdapter
 import io.trzcinski.oasgen.templaterenderer.dto.FileTemplate
 import java.io.File
 
-class TemplateSupplier {
+class TemplateSupplier(
+    val filesystem: FilesystemAdapter
+) {
 
     fun getApiModels() : List<FileTemplate> {
-        return findInDirMatching(System.getProperty("user.dir"), Regex("dto")).map {
+        return findInDirMatching(filesystem.root, Regex("dto")).map {
             FileTemplate(
                 it.path
+                    .replace(filesystem.root, "")
                     .replace(".vm", "")
                     .replace("/oasgen/", "")
                     .replace(System.getProperty("user.dir"), ""),
@@ -18,9 +22,10 @@ class TemplateSupplier {
         }
     }
     fun getClients() : List<FileTemplate> {
-        return findInDirMatching(System.getProperty("user.dir"), Regex("crud")).map {
+        return findInDirMatching(filesystem.root, Regex("crud")).map {
             FileTemplate(
                 it.path
+                    .replace(filesystem.root, "")
                     .replace(".vm", "")
                     .replace("/oasgen/", "")
                     .replace(System.getProperty("user.dir"), ""),

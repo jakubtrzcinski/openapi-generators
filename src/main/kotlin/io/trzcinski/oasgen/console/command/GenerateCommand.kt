@@ -30,10 +30,10 @@ class GenerateCommand(
         val clients = templateSupplier.getClients()
         val apiModels = templateSupplier.getApiModels()
         if(clients.isEmpty()){
-           print("Could not resolve any client template")
+           println("Could not resolve any client template")
         }
         if(apiModels.isEmpty()){
-           print("Could not resolve any api model template")
+            println("Could not resolve any api model template")
         }
         for (clientTemplate in clients) {
             for (crud in apiDefinition.cruds) {

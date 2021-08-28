@@ -20,7 +20,7 @@ package $package
     "Boolean" : "Boolean",
     "Object" : "Map<Object, Object>",
     "Void" : "Void",
-    "DateTime" : "org.joda.time.DateTime"
+    "DateTime" : "java.time.LocalDateTime"
 })
 #set ($placeMapping = {
     "body" : "@Body()",

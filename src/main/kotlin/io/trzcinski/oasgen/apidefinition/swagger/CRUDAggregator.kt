@@ -2,7 +2,6 @@ package io.trzcinski.oasgen.apidefinition.swagger
 
 import io.trzcinski.oasgen.apidefinition.dto.*
 import io.trzcinski.oasgen.apidefinition.swagger.dto.EndpointAggregate
-import io.trzcinski.oasgen.utils.StringUtils
 
 
 class CRUDAggregator {

@@ -2,7 +2,9 @@ package io.trzcinski.oasgen.filesystem
 
 import java.io.File
 
-class FilesystemAdapter {
+class FilesystemAdapter(
+    val root: String
+) {
 
     fun mkdirs(dir: String){
         File(relativize(dir)).mkdirs()
@@ -11,7 +13,7 @@ class FilesystemAdapter {
         return File(relativize(dir)).exists()
     }
     fun save(path: String, content: String){
-        println("Creating file: $path")
+        println("Creating file: "+relativize(path))
         val file = File(relativize(path))
         file.parentFile.mkdirs()
         file.writeText(content.trim())
@@ -19,13 +21,17 @@ class FilesystemAdapter {
 
     private fun relativize(path: String) : String {
         if(path.startsWith("/")){
-            return System.getProperty("user.dir")+path
+            return root+path
         }
-        return System.getProperty("user.dir")+"/"+path
+        return root+"/"+path
     }
 
     fun walkTopDown(): FileTreeWalk {
         return File(relativize("/")).walkTopDown()
 
+    }
+
+    fun delete(s: String) {
+        File(relativize(s)).deleteRecursively()
     }
 }

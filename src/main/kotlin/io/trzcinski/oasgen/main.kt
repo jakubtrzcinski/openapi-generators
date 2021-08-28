@@ -17,7 +17,10 @@ import io.trzcinski.oasgen.templaterenderer.TemplateRenderer
 import io.trzcinski.oasgen.templatesupplier.TemplateSupplier
 
 fun main(args: Array<String>) {
+    init(System.getProperty("user.dir")).run(args)
+}
 
+fun init(path: String) : ConsoleAdapter{
     val dtoMapper = DtoMapper()
     val oasFacade = ApiDefinitionFacade(
         SwaggerApiDefinitionCreator(
@@ -27,9 +30,9 @@ fun main(args: Array<String>) {
             CRUDAggregator()
         )
     )
-    val templateSupplier = TemplateSupplier()
-    val filesystemAdapter = FilesystemAdapter()
-    val app = ConsoleAdapter(
+    val filesystemAdapter = FilesystemAdapter(path)
+    val templateSupplier = TemplateSupplier(filesystemAdapter)
+    return ConsoleAdapter(
         listOf(
             GenerateCommand(
                 oasFacade,
@@ -44,6 +47,4 @@ fun main(args: Array<String>) {
             )
         )
     )
-
-    app.run(args)
 }

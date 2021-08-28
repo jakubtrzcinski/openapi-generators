@@ -16,8 +16,7 @@ class InitCommand(
 
     override fun run(args: List<String>) {
         if(filesystemAdapter.exists("oasgen")){
-            println("Project is already initialized")
-            return
+            filesystemAdapter.delete("oasgen")
         }
         filesystemAdapter.mkdirs("oasgen")
         val lang = if(args.isNotEmpty()) args[0] else discoveryFacade.discoveryProjectLanguage()

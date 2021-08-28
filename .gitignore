@@ -39,3 +39,10 @@ build
 *.ipr
 *~
 *.swp
+/e2e/dart/build/
+/e2e/kotlin/build/
+/e2e/*/*.jar
+*.jar
+/e2e/kotlin/src/main/kotlin/io/trzcinski/test/
+/e2e/dart/lib/api/
+/e2e/*/oasgen/
