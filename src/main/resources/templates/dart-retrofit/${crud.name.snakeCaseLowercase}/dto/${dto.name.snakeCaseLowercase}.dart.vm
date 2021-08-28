@@ -3,7 +3,7 @@
     "Integer" : "int",
     "String" : "String",
     "Boolean" : "bool",
-    "Object" : "Map<Object, Object>",
+    "Object" : "Map<Object, String>",
     "Void" : "void"
 })
 import 'package:json_annotation/json_annotation.dart';

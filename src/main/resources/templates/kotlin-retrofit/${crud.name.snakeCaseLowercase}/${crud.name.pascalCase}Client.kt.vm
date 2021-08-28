@@ -18,7 +18,7 @@ package $package
     "Integer" : "Int",
     "String" : "String",
     "Boolean" : "Boolean",
-    "Object" : "Map<Object, Object>",
+    "Object" : "Map<Object, String>",
     "Void" : "Void",
     "DateTime" : "java.time.LocalDateTime"
 })

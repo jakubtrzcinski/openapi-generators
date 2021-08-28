@@ -1,0 +1,66 @@
+#* @vtlvariable name="crud" type="io.trzcinski.oasgen.apidefinition.dto.CRUD" *#
+#* @vtlvariable name="path" type="java.lang.String" *#
+#set( $crudClassName = ${crud.name.pascalCase} )
+#set( $package = ${path.replaceAll(${crudClassName}, "").replaceAll("(src/main/java/|/Client.java)","").replaceAll("/", ".")} )
+#set( $basePackage = ${basePath.replaceAll(${crudClassName}, "").replaceAll("(src/main/java/|/Client.java)","").replaceAll("/", ".")} )
+package $package;
+
+
+#set ($methodMapping = {
+    "POST" : "PostMapping" ,
+    "GET" : "GetMapping",
+    "PUT" : "PutMapping",
+    "DELETE" : "DeleteMapping",
+    "OPTIONS" : "OptionsMapping",
+    "HEAD" : "HeadMapping",
+    "PATCH" : "PatchMapping"
+})
+#set ($typeMapping = {
+    "Integer" : "Integer",
+    "String" : "String",
+    "Boolean" : "Boolean",
+    "Object" : "Map<String, Object>",
+    "Void" : "void",
+    "DateTime" : "java.time.LocalDateTime"
+})
+#set ($placeMapping = {
+    "body" : "@RequestBody()",
+    "query" : '@RequestParam("%s")',
+    "path" : '@RequestParam("%s")',
+    "header" : '@RequestHeader("%s")'
+})
+
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import java.util.Map;
+
+#foreach(${import} in ${crud.ownImports})
+import ${package}.dto.${import.pascalCase};
+#end
+#foreach(${import} in ${crud.externalImports})
+import ${basePackage}.${import.crud.snakeCaseLowercase}.dto.${import.name.pascalCase};
+#end
+
+interface ${crudClassName}Client {
+#foreach(${endpoint} in ${crud.endpoints})
+    #set( $returnType = $!{typeMapping.getOrDefault(${endpoint.responseType.name.pascalCase}, ${endpoint.responseType.name.pascalCase})} )
+    #if($endpoint.responseType.list)#set( $returnType = "List<$returnType>" )#end
+
+    @$!{methodMapping.get($endpoint.method)}("${endpoint.path}")
+    $returnType ${endpoint.name}(
+
+    #foreach(${param} in ${endpoint.params})
+        #set( $paramType = $!{typeMapping.getOrDefault(${param.type.name.pascalCase}, ${param.type.name.pascalCase})} )
+        #if($param.type.list)
+        #set( $paramType = "List<$paramType>" )
+        #end
+        #set( $paramAdnotation = $!{placeMapping.getOrDefault(${param.place}, ${param.place}).replace("%s", ${param.alias})} )
+
+        $paramAdnotation $paramType ${param.name}#if( $foreach.hasNext ), #end
+    #end
+
+    );
+
+
+#end
+}

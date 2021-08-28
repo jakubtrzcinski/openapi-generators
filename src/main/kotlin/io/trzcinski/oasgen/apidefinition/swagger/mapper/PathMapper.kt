@@ -57,7 +57,8 @@ class PathMapper(
         return try {
             val schema = operation.requestBody.content["application/json"]!!.schema
 
-            dtoMapper.getType(schema, schema.required.contains(schema.name))
+            val required = schema.required ?: emptyList()
+            dtoMapper.getType(schema, required.contains(schema.name))
 
         } catch (ex: Exception) {
             null

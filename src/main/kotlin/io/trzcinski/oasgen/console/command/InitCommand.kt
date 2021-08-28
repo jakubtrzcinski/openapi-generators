@@ -38,6 +38,12 @@ class InitCommand(
                 templateSupplier.fromResources("kotlin-retrofit/\${crud.name.snakeCaseLowercase}/\${crud.name.pascalCase}Client.kt.vm"),
             )
         }
+        if(lang == "java"){
+            return listOf(
+                templateSupplier.fromResources("java-feing/\${crud.name.snakeCaseLowercase}/dto/\${dto.name.pascalCase}.java.vm"),
+                templateSupplier.fromResources("java-feing/\${crud.name.snakeCaseLowercase}/\${crud.name.pascalCase}Client.java.vm"),
+            )
+        }
         throw RuntimeException("lang $lang not supported")
     }
 }

@@ -14,7 +14,7 @@
     "Integer" : "int",
     "String" : "String",
     "Boolean" : "bool",
-    "Object" : "Map<Object, Object>",
+    "Object" : "Map<Object, String>",
     "Void" : "void"
 })
 #set ($placeMapping = {
