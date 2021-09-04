@@ -10,22 +10,22 @@ import io.trzcinski.oasgen.apidefinition.dto.Type
 class PathMapper(
     private val dtoMapper: DtoMapper
 ) {
-    fun mapPathItems(path: String, item: PathItem): List<Endpoint> {
+    fun mapPathItems(basePath: String, path: String, item: PathItem): List<Endpoint> {
         val endpoints: ArrayList<Endpoint> = ArrayList(8)
 
-        if (item.get != null) endpoints.add(mapPathItems(path, "GET", item.get))
-        if (item.put != null) endpoints.add(mapPathItems(path, "PUT", item.put))
-        if (item.post != null) endpoints.add(mapPathItems(path, "POST", item.post))
-        if (item.delete != null) endpoints.add(mapPathItems(path, "DELETE", item.delete))
-        if (item.options != null) endpoints.add(mapPathItems(path, "OPTIONS", item.options))
-        if (item.head != null) endpoints.add(mapPathItems(path, "HEAD", item.head))
-        if (item.patch != null) endpoints.add(mapPathItems(path, "PATCH", item.patch))
+        if (item.get != null) endpoints.add(mapPathItems(basePath, path, "GET", item.get))
+        if (item.put != null) endpoints.add(mapPathItems(basePath, path, "PUT", item.put))
+        if (item.post != null) endpoints.add(mapPathItems(basePath, path, "POST", item.post))
+        if (item.delete != null) endpoints.add(mapPathItems(basePath, path, "DELETE", item.delete))
+        if (item.options != null) endpoints.add(mapPathItems(basePath, path, "OPTIONS", item.options))
+        if (item.head != null) endpoints.add(mapPathItems(basePath, path, "HEAD", item.head))
+        if (item.patch != null) endpoints.add(mapPathItems(basePath, path, "PATCH", item.patch))
 
         return endpoints
 
     }
 
-    private fun mapPathItems(path: String, method: String, item: Operation): Endpoint {
+    private fun mapPathItems(basePath: String, path: String, method: String, item: Operation): Endpoint {
         val params: MutableList<Param> = if (item.parameters == null) mutableListOf() else item.parameters
             .map {
                 Param(
@@ -45,6 +45,7 @@ class PathMapper(
             name = name.substring(0, name.indexOf("Using"))
         }
         return Endpoint(
+            basePath,
             path,
             ConvertableName(name),
             method,

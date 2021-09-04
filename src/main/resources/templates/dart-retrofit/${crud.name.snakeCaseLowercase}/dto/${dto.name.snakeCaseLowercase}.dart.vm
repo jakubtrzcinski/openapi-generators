@@ -1,5 +1,7 @@
 #* @vtlvariable name="dto" type="io.trzcinski.oasgen.apidefinition.dto.ApiModel" *#
 #set ($typeMapping = {
+    "LocalDateTime" : "DateTime",
+    "Number" : "double",
     "Integer" : "int",
     "String" : "String",
     "Boolean" : "bool",
@@ -19,13 +21,16 @@ part '${dto.name.snakeCaseLowercase}.g.dart';
 @JsonSerializable()
 class ${dto.name.pascalCase} {
 #foreach(${var} in ${dto.properties})
-    $!{typeMapping.getOrDefault(${var.type.name.pascalCase}, ${var.type.name.pascalCase})}#if($var.type.optional)?#end ${var.name};
+    #set( $type = $!{typeMapping.getOrDefault(${var.type.name.pascalCase}, ${var.type.name.pascalCase})} )
+    #if($var.type.list)#set( $type = "List<$type>" )#end
+    $type#if($var.type.optional)?#end ${var.name.camelCase};
 #end
-    ${dto.name}({
+
+${dto.name}({
     #foreach(${var} in ${dto.properties})
-        #if(!$var.type.optional) required#end this.${var.name},
+        #if(!$var.type.optional) required#end this.${var.name.camelCase},
     #end
-    });
-    factory ${dto.name.pascalCase}.fromJson(Map<String, dynamic> json) => _$${dto.name.pascalCase}FromJson(json);
-    Map<String, dynamic> toJson() => _$${dto.name.pascalCase}ToJson(this);
+});
+factory ${dto.name.pascalCase}.fromJson(Map<String, dynamic> json) => _$${dto.name.pascalCase}FromJson(json);
+Map<String, dynamic> toJson() => _$${dto.name.pascalCase}ToJson(this);
 }

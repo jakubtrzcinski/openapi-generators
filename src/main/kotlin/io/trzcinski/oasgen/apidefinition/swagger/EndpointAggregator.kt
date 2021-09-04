@@ -10,8 +10,14 @@ class EndpointAggregator(
     private val dtoMapper: DtoMapper
 ) {
     fun run(openApi: OpenAPI): EndpointAggregate {
+        val base = openApi.servers
+            .firstOrNull()
+            ?.url
+            ?.replace(Regex("(//|)(http(s|)://)(www.|).+/"), "")
+            ?.let { "/$it" }
+            ?: ""
         val endpoints = openApi.paths.flatMap {
-            pathMapper.mapPathItems(it.key, it.value)
+            pathMapper.mapPathItems(base, it.key, it.value)
         }
 
         val dtos = openApi

@@ -5,34 +5,48 @@ import com.improve_future.case_changer.toSnakeCase
 /**
  * String wrapper
  */
-class ConvertableName(
+class ConvertableName {
     val value: String
-) {
+
+    constructor(value: String) {
+        this.value = value.split("-").map { it.capitalize() }.joinToString("")
+        this.kebabCaseLowercase = this.value.capitalize().toSnakeCase().replace("_", "-").toLowerCase()
+        this.kebabCaseUppercase = this.value.capitalize().toSnakeCase().replace("_", "-").toUpperCase()
+        this.snakeCaseLowercase = this.value.capitalize().toSnakeCase().replace("-", "_").toLowerCase()
+        this.snakeCaseUppercase = this.value.capitalize().toSnakeCase().replace("-", "_").toUpperCase()
+        this.camelCase = this.value.decapitalize()
+        this.pascalCase = this.value.capitalize()
+    }
+
     /**
      *  eg. user-api-model
      */
-    val kebabCaseLowercase: String = value.capitalize().toSnakeCase().replace("_", "-").toLowerCase()
+    val kebabCaseLowercase: String
 
     /**
      * eg. USER-API-MODEL
      */
-    val kebabCaseUppercase: String = value.capitalize().toSnakeCase().replace("_", "-").toUpperCase()
+    val kebabCaseUppercase: String
+
     /**
      * eg. user_api_model
      */
-    val snakeCaseLowercase: String = value.capitalize().toSnakeCase().replace("-", "_").toLowerCase()
+    val snakeCaseLowercase: String
+
     /**
      * eg. USER_API_MODEL
      */
-    val snakeCaseUppercase: String = value.capitalize().toSnakeCase().replace("-", "_").toUpperCase()
+    val snakeCaseUppercase: String
+
     /**
      * eg. userApiModel
      */
-    val camelCase: String = value.decapitalize()
+    val camelCase: String
+
     /**
      * eg. UserApiModel
      */
-    val pascalCase: String = value.capitalize()
+    val pascalCase: String
 
 
     override fun toString(): String {

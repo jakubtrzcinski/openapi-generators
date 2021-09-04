@@ -11,7 +11,9 @@
     "PATCH" : "PATCH"
 })
 #set ($typeMapping = {
+    "LocalDateTime" : "DateTime",
     "Integer" : "int",
+    "Number" : "double",
     "String" : "String",
     "Boolean" : "bool",
     "Object" : "Map<Object, String>",
@@ -30,7 +32,7 @@ import 'package:retrofit/retrofit.dart';
 import 'dto/${import.snakeCaseLowercase}.dart';
 #end
 #foreach(${import} in ${crud.externalImports})
-import '../../${import.crud.snakeCaseLowercase}/dto/${import.name.snakeCaseLowercase}.dart';
+import '../${import.crud.snakeCaseLowercase}/dto/${import.name.snakeCaseLowercase}.dart';
 #end
 
 part '${crudFileName}_client.g.dart';
@@ -42,7 +44,7 @@ abstract class  ${crudClassName}Client {
     #if($endpoint.responseType.list)#set( $returnType = "List<$returnType>" )#end
 
     @$!{methodMapping.get($endpoint.method)}("${endpoint.path}")
-    Future<$returnType> ${endpoint.name}(
+    Future<$returnType> ${endpoint.name.camelCase}(
 
     #foreach(${param} in ${endpoint.params})
         #set( $paramType = $!{typeMapping.getOrDefault(${param.type.name.pascalCase}, ${param.type.name.pascalCase})} )
