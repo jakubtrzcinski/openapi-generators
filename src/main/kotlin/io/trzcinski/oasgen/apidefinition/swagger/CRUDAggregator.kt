@@ -6,79 +6,63 @@ import io.trzcinski.oasgen.apidefinition.swagger.dto.EndpointAggregate
 
 class CRUDAggregator {
     fun run(endpointAggregate: EndpointAggregate): CRUDAggregate {
-        val crudsRaw = getCruds(endpointAggregate)
-        val commonDtos = getCommonDtos(crudsRaw, endpointAggregate.apiModels)
+        val crudsRaw = getCruds(endpointAggregate).toMutableMap()
+        crudsRaw[ConvertableName("Commons")] = ArrayList()
 
-        val commonDtoNames = commonDtos.map { it.name }
-        val crudsDtos = crudsRaw
-            .mapValues { endpoints ->
-                getDTOS(endpoints.value, endpointAggregate.apiModels)
-                    .flatMap { expand(it, endpointAggregate.apiModels) }
-                    .map { it.name }
-                    .filter { !commonDtoNames.contains(it) }
-                    .distinct()
-            }.toMutableMap()
-        crudsDtos[ConvertableName("Commons")] = commonDtos.map { it.name }
+        var crudNames = crudsRaw.keys.sortedByDescending { it.value.length }
+        for (apiModel in endpointAggregate.apiModels) {
+            for (crudName in crudNames) {
+                if(apiModel.name.pascalCase.contains(crudName.pascalCase)){
+                    apiModel.origin = crudName;
+                    break;
+                }
+            }
+        }
+        for (apiModel in endpointAggregate.apiModels) {
+            if(apiModel.origin.pascalCase == ""){
+                apiModel.origin = ConvertableName("Commons")
+            }
+        }
+        val apiModelByCrudMap = endpointAggregate.apiModels.groupBy { it.origin }.mapValues { it.value.map { v -> v.name } }
 
         val cruds = crudsRaw.map {
-            val referingDtos = getDTOS(it.value, endpointAggregate.apiModels)
-                .flatMap { expand(it, endpointAggregate.apiModels) }.distinct()
-            val commons = referingDtos.filter { dto -> commonDtos.contains(dto) }.map { it.name }.distinct()
-
-            val dtos = endpointAggregate.apiModels.filter { dto -> crudsDtos[it.key]!!.contains(dto.name) }.map { dto ->
-                addReferences(
-                    dto,
-                    it.key,
-                    crudsDtos,
-                    commons
-                )
-            }
-
-            val imports = getImports(it.value, crudsDtos, commons)
+            val crudsDtos = endpointAggregate.apiModels.filter { import -> import.origin ==  it.key }
+            val imports = getImports(it.value, apiModelByCrudMap)
             CRUD(
                 it.key,
                 it.value,
-                dtos,
+                crudsDtos,
                 imports.filter { import-> import.crud == it.key }.map { it.name },
                 imports.filter { import-> import.crud != it.key },
             )
-        }.toMutableList()
-        if(cruds.findLast { it.name.value == "Commons" } == null){
-            cruds.add(CRUD(ConvertableName("Commons"), listOf(), commonDtos, listOf(), listOf()))
         }
+        endpointAggregate.apiModels.forEach { addReferences(it, apiModelByCrudMap) }
+
         return CRUDAggregate(
-            cruds,
-            commonDtos
+            cruds
         )
     }
 
-    private fun addReferences(apiModel: ApiModel, crud: ConvertableName, cruds: Map<ConvertableName, List<ConvertableName>>, commons: List<ConvertableName>): ApiModel {
-        val imports = apiModel.properties.mapNotNull { findReference(it.type, cruds, commons) }.distinct()
-        return ApiModel(
-            apiModel.name,
-            apiModel.properties,
-            imports.filter { it.crud.value == crud.value  }.map { it.name },
-            imports.filter { it.crud.value  != crud.value  },
-        )
+    private fun addReferences(apiModel: ApiModel, cruds: Map<ConvertableName, List<ConvertableName>>) {
+        val imports = apiModel.properties.mapNotNull { findReference(it.type, cruds,) }.distinct()
+        apiModel.ownCrudImports.addAll(imports.filter { it.crud.value == apiModel.origin.value  }.map { it.name })
+        apiModel.externalCrudImports.addAll(imports.filter { it.crud.value  != apiModel.origin.value  })
     }
 
-    private fun getImports(endpoints: List<Endpoint>, cruds: Map<ConvertableName, List<ConvertableName>>, commons: List<ConvertableName>): List<ExternalImport> {
+    private fun getImports(endpoints: List<Endpoint>, cruds: Map<ConvertableName, List<ConvertableName>>): List<ExternalImport> {
         val dto = endpoints
             .flatMap { listOf(listOf(it.responseType), it.params.map { param -> param.type }).flatten() }
-        return dto.mapNotNull { findReference(it, cruds, commons) }.distinct()
+        return dto.mapNotNull { findReference(it, cruds) }.distinct()
     }
 
 
-    private fun findReference(dto: Type, cruds: Map<ConvertableName, List<ConvertableName>>, commons: List<ConvertableName>): ExternalImport? {
+    private fun findReference(dto: Type, cruds: Map<ConvertableName, List<ConvertableName>>): ExternalImport? {
         for (crud in cruds) {
             for (cDto in crud.value) {
                 if (dto.name == cDto) {
                     return ExternalImport(crud.key, dto.name)
                 }
             }
-        }
-        if (commons.contains(dto.name)) {
-            return ExternalImport(ConvertableName("Commons"), dto.name)
         }
         return null
     }
@@ -107,28 +91,4 @@ class CRUDAggregator {
             path.substring(0, path.indexOf("/")).replace("/", "")
         )
     }
-
-    private fun getCommonDtos(cruds: Map<ConvertableName, ArrayList<Endpoint>>, allApiModels: List<ApiModel>): List<ApiModel> {
-        return allApiModels.filter { cruds.keys.none { crud -> isFromCrud(it, crud) } }
-    }
-
-    private fun isFromCrud(it: ApiModel, crud: ConvertableName) : Boolean {
-        return it.name.value.toLowerCase().contains(crud.value.toLowerCase())
-    }
-
-    private fun getDTOS(endpoints: List<Endpoint>, allApiModels: List<ApiModel>): List<ApiModel> {
-        return endpoints
-            .flatMap {
-                listOf(listOf(it.responseType), it.params.map { it.type }).flatten()
-                    .mapNotNull { allApiModels.firstOrNull { dto -> dto.name == it.name } }
-            }
-    }
-
-    private fun expand(apiModel: ApiModel, apiModels: List<ApiModel>): List<ApiModel> {
-        val types = apiModel.properties.map { it.type.name }
-        val ret = apiModels.filter { types.contains(it.name) }.flatMap { expand(it, apiModels) }.toMutableList()
-        ret.add(apiModel)
-        return ret
-    }
-
 }

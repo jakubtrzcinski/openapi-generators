@@ -10,12 +10,13 @@ class DtoMapper {
     private fun getDto(name: String, swaggerDto: ObjectSchema): ApiModel {
         val required = swaggerDto.required ?: emptyList()
         return ApiModel(
+            ConvertableName(""),
             ConvertableName(name),
             swaggerDto.properties.map { (key, value) ->
                 Variable(ConvertableName(key), getType(value, !required.contains(key)))
             },
-            listOf(),
-            listOf()
+            mutableListOf(),
+            mutableListOf()
         )
     }
 
