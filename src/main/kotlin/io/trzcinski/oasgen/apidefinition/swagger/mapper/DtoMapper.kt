@@ -7,12 +7,22 @@ import io.trzcinski.oasgen.apidefinition.dto.Type
 import io.trzcinski.oasgen.apidefinition.dto.Variable
 
 class DtoMapper {
-    private fun getDto(name: String, swaggerDto: ObjectSchema): ApiModel {
+    private fun getDto(name: String, swaggerDto: Schema<Any>): ApiModel {
         val required = swaggerDto.required ?: emptyList()
+        val properties = swaggerDto.properties ?: mutableMapOf();
+
+        if(swaggerDto is ComposedSchema){
+            for (schema in swaggerDto.allOf) {
+                if(schema.properties != null) {
+                    properties.putAll(schema.properties)
+                }
+            }
+        }
+
         return ApiModel(
             ConvertableName(""),
             ConvertableName(name),
-            swaggerDto.properties.map { (key, value) ->
+            properties.map { (key, value) ->
                 Variable(ConvertableName(key), getType(value, !required.contains(key)))
             },
             mutableListOf(),
@@ -23,7 +33,7 @@ class DtoMapper {
     fun map(entry: Map.Entry<String, Schema<Any>>) : ApiModel{
         return getDto(
             entry.key,
-            entry.value as ObjectSchema
+            entry.value
         )
 
     }

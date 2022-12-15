@@ -38,15 +38,19 @@ class GenerateCommand(
         for (clientTemplate in clients) {
             for (crud in apiDefinition.cruds) {
                 if(crud.endpoints.isNotEmpty()) {
-                    renderedClasses.add(
-                        templateRenderer.render(clientTemplate, crud, args[1])
-                    )
+                    try {
+                        renderedClasses.add(
+                            templateRenderer.render(clientTemplate, crud, args[1])
+                        )
+                    } catch (ex: Exception){}
                 }
                 for (apiModel in crud.apiModels) {
                     for (apiModelTemplate in apiModels) {
-                        renderedClasses.add(
-                            templateRenderer.render(apiModelTemplate, crud, apiModel, args[1])
-                        )
+                        try {
+                            renderedClasses.add(
+                                templateRenderer.render(apiModelTemplate, crud, apiModel, args[1])
+                            )
+                        } catch (ex: Exception){}
                     }
                 }
             }
