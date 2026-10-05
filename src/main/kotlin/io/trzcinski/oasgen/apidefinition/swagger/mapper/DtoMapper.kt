@@ -92,11 +92,20 @@ class DtoMapper {
     fun map(entry: Map.Entry<String, Schema<Any>>): ApiModel = getDto(entry.key, entry.value)
 
     fun getType(schema: Schema<Any>?, optional: Boolean): Type {
+        val mapped = mapType(schema, optional)
+        return mapped.copy(nullable = optional || schema?.nullable == true || mapped.nullable)
+    }
+
+    private fun mapType(schema: Schema<Any>?, optional: Boolean): Type {
         if (schema == null) {
             return Type(ConvertableName("Void"), optional, false)
         }
         if (schema.`$ref` != null) {
             val name = schemaName(schema.`$ref`)
+            val resolved = resolve(schema)
+            if (resolved !== schema && resolved.additionalProperties is Schema<*>) {
+                return getType(resolved, optional)
+            }
             if (enumSchemaNames.get().contains(name)) {
                 return Type(ConvertableName("string"), optional, false)
             }
@@ -110,7 +119,9 @@ class DtoMapper {
         }
         if (schema is ArraySchema) {
             @Suppress("UNCHECKED_CAST")
-            return getType(schema.items as Schema<Any>, false).copy(list = true, optional = optional)
+            return getType(schema.items as Schema<Any>, false).copy(
+                list = true, optional = optional, nullable = optional || schema.nullable == true
+            )
         }
         if (schema is ComposedSchema) {
             schema.allOf.orEmpty().firstOrNull()?.let {
@@ -127,6 +138,13 @@ class DtoMapper {
         }
         if (schema.type == "string" && schema.format == "uuid") {
             return Type(ConvertableName("UUID"), optional, false)
+        }
+        if (schema.additionalProperties is Schema<*>) {
+            @Suppress("UNCHECKED_CAST")
+            return Type(
+                ConvertableName("object"), optional, false,
+                mapValue = getType(schema.additionalProperties as Schema<Any>, false)
+            )
         }
         if (schema.type == null) {
             return Type(ConvertableName("Any"), optional, false)

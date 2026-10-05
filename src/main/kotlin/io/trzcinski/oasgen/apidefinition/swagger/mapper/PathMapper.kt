@@ -2,6 +2,7 @@ package io.trzcinski.oasgen.apidefinition.swagger.mapper
 
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
+import io.swagger.v3.oas.models.parameters.Parameter
 import io.trzcinski.oasgen.apidefinition.dto.ConvertableName
 import io.trzcinski.oasgen.apidefinition.dto.Endpoint
 import io.trzcinski.oasgen.apidefinition.dto.Param
@@ -13,26 +14,30 @@ class PathMapper(
     fun mapPathItems(basePath: String, path: String, item: PathItem): List<Endpoint> {
         val endpoints: ArrayList<Endpoint> = ArrayList(8)
 
-        if (item.get != null) endpoints.add(mapPathItems(basePath, path, "GET", item.get))
-        if (item.put != null) endpoints.add(mapPathItems(basePath, path, "PUT", item.put))
-        if (item.post != null) endpoints.add(mapPathItems(basePath, path, "POST", item.post))
-        if (item.delete != null) endpoints.add(mapPathItems(basePath, path, "DELETE", item.delete))
-        if (item.options != null) endpoints.add(mapPathItems(basePath, path, "OPTIONS", item.options))
-        if (item.head != null) endpoints.add(mapPathItems(basePath, path, "HEAD", item.head))
-        if (item.patch != null) endpoints.add(mapPathItems(basePath, path, "PATCH", item.patch))
+        val inheritedParameters = item.parameters.orEmpty()
+        if (item.get != null) endpoints.add(mapPathItems(basePath, path, "GET", item.get, inheritedParameters))
+        if (item.put != null) endpoints.add(mapPathItems(basePath, path, "PUT", item.put, inheritedParameters))
+        if (item.post != null) endpoints.add(mapPathItems(basePath, path, "POST", item.post, inheritedParameters))
+        if (item.delete != null) endpoints.add(mapPathItems(basePath, path, "DELETE", item.delete, inheritedParameters))
+        if (item.options != null) endpoints.add(mapPathItems(basePath, path, "OPTIONS", item.options, inheritedParameters))
+        if (item.head != null) endpoints.add(mapPathItems(basePath, path, "HEAD", item.head, inheritedParameters))
+        if (item.patch != null) endpoints.add(mapPathItems(basePath, path, "PATCH", item.patch, inheritedParameters))
 
         return endpoints
 
     }
 
-    private fun mapPathItems(basePath: String, path: String, method: String, item: Operation): Endpoint {
-        val params: MutableList<Param> = if (item.parameters == null) mutableListOf() else item.parameters
+    private fun mapPathItems(basePath: String, path: String, method: String, item: Operation, inheritedParameters: List<Parameter>): Endpoint {
+        val operationParameters = item.parameters.orEmpty()
+        val overriddenNames = operationParameters.mapNotNull { it.name }.toSet()
+        val params = (operationParameters + inheritedParameters.filter { it.name !in overriddenNames })
+            .filter { it.`in` != null && it.name != null && it.schema != null }
             .map {
                 Param(
                     it.`in`,
                     ConvertableName(it.name),
                     it.name,
-                    dtoMapper.getType(it.schema, false)
+                    dtoMapper.getType(it.schema, it.required != true)
                 )
             }.toMutableList()
 
@@ -71,6 +76,7 @@ class PathMapper(
     private fun getResponseType(operation: Operation): Type {
         try {
             val responses = operation.responses["200"]
+                ?: operation.responses["201"]
                 ?: operation.responses["default"]
                 ?: return Type(ConvertableName("Void"), false, false)
             val schema = responses.content["*/*"]?.schema ?: responses.content["application/json"]?.schema

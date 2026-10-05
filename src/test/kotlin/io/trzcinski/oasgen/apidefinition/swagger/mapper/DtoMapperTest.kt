@@ -10,6 +10,55 @@ import kotlin.test.assertEquals
 
 class DtoMapperTest {
     @Test
+    fun `required nullable property preserves presence separately from nullability`() {
+        val mapper = DtoMapper()
+        val schema = Schema<Any>().type("string").nullable(true)
+        val type = mapper.getType(schema, false)
+        assertEquals(false, type.optional)
+        assertEquals(true, type.nullable)
+    }
+
+    @Test
+    fun `typed additional properties preserve referenced map values`() {
+        val mapper = DtoMapper()
+        val schema = Schema<Any>().type("object").additionalProperties(
+            Schema<Any>().`$ref`("#/components/schemas/Child")
+        )
+        val type = mapper.getType(schema, false)
+        assertEquals("Child", type.mapValue?.name?.value)
+    }
+
+    @Test
+    fun `map aliases preserve nested nullable values and optional presence`() {
+        val mapper = DtoMapper()
+        val alias = Schema<Any>().type("object").additionalProperties(
+            Schema<Any>().type("string").nullable(true)
+        )
+        mapper.registerEnumSchemas(mapOf("Labels" to alias))
+        val type = mapper.getType(Schema<Any>().`$ref`("#/components/schemas/Labels"), true)
+        assertEquals(true, type.optional)
+        assertEquals(true, type.nullable)
+        assertEquals("String", type.mapValue?.name?.value)
+        assertEquals(true, type.mapValue?.nullable)
+    }
+
+    @Test
+    fun `optional plain maps and model lists retain existing shapes`() {
+        val mapper = DtoMapper()
+        val plain = mapper.getType(Schema<Any>().type("object").additionalProperties(true), true)
+        assertEquals("Object", plain.name.value)
+        assertEquals(null, plain.mapValue)
+        assertEquals(true, plain.nullable)
+        val list = mapper.getType(io.swagger.v3.oas.models.media.ArraySchema().items(
+            Schema<Any>().`$ref`("#/components/schemas/Child")
+        ) as Schema<Any>, false)
+        assertEquals("Child", list.name.value)
+        assertEquals(true, list.list)
+        assertEquals(false, list.optional)
+        assertEquals(false, list.nullable)
+    }
+
+    @Test
     fun `maps discriminated oneOf schemas to typed union metadata`() {
         val measurementKind = StringSchema().apply {
             enum = listOf("WEIGHT", "NOTE")
