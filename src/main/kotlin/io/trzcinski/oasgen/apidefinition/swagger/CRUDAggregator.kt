@@ -57,6 +57,7 @@ class CRUDAggregator {
 
 
     private fun findReference(dto: Type, cruds: Map<ConvertableName, List<ConvertableName>>): ExternalImport? {
+        dto.mapValue?.let { return findReference(it, cruds) }
         for (crud in cruds) {
             for (cDto in crud.value) {
                 if (dto.name == cDto) {

@@ -16,6 +16,8 @@ class EndpointAggregator(
             ?.replace(Regex("(//|)(http(s|)://)(www.|).+/"), "")
             ?.let { "/$it" }
             ?: ""
+        @Suppress("UNCHECKED_CAST")
+        dtoMapper.registerEnumSchemas(openApi.components.schemas as Map<String, io.swagger.v3.oas.models.media.Schema<Any>>)
         val endpoints = openApi.paths.flatMap {
             pathMapper.mapPathItems(base, it.key, it.value)
         }
@@ -23,6 +25,7 @@ class EndpointAggregator(
         val dtos = openApi
             .components
             .schemas
+            .filterKeys { !dtoMapper.isEnumSchema(it) }
             .map { dtoMapper.map(it) }
 
         return EndpointAggregate(

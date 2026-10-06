@@ -1,0 +1,55 @@
+openapi: 3.0.3
+info:
+  title: SDK compatibility
+  version: '1'
+servers:
+  - url: http://localhost
+paths:
+  /items/{id}:
+    parameters:
+      - $ref: '#/components/parameters/id'
+    get:
+      operationId: getItem
+      parameters:
+        - name: query
+          in: query
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Union'
+components:
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+  schemas:
+    Kind:
+      type: string
+      enum: [ONE, TWO]
+    Union:
+      oneOf:
+        - $ref: '#/components/schemas/One'
+        - $ref: '#/components/schemas/Two'
+      discriminator:
+        propertyName: kind
+        mapping:
+          ONE: '#/components/schemas/One'
+          TWO: '#/components/schemas/Two'
+    One:
+      type: object
+      properties:
+        kind:
+          $ref: '#/components/schemas/Kind'
+    Two:
+      type: object
+      properties:
+        kind:
+          $ref: '#/components/schemas/Kind'
