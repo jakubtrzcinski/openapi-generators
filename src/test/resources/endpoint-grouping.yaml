@@ -5,6 +5,13 @@ info:
 servers:
   - url: http://localhost
 paths:
+  /status:
+    get:
+      x-oasgen-group: commons
+      operationId: getStatus
+      responses:
+        '204':
+          description: Status
   /items:
     get:
       operationId: getItems

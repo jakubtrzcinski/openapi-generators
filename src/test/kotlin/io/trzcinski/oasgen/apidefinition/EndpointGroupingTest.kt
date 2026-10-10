@@ -24,6 +24,7 @@ class EndpointGroupingTest {
         assertEquals("/me/region", region.endpoints.single().path)
         assertEquals("UserRegion", region.apiModels.single().name.pascalCase)
         val commons = result.cruds.single { it.name.pascalCase == "Commons" }
+        assertEquals("/status", commons.endpoints.single().path)
         assertEquals(setOf("Measurement", "WeightMeasurement", "MeasurementDietSnapshot",
             "DietProductNutrientMetadata", "SocialMergeRequest"),
             commons.apiModels.map { it.name.pascalCase }.toSet())

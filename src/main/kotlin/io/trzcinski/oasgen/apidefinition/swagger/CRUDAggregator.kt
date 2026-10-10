@@ -7,7 +7,7 @@ import io.trzcinski.oasgen.apidefinition.swagger.dto.EndpointAggregate
 class CRUDAggregator {
     fun run(endpointAggregate: EndpointAggregate): CRUDAggregate {
         val crudsRaw = getCruds(endpointAggregate).toMutableMap()
-        crudsRaw[ConvertableName("Commons")] = ArrayList()
+        crudsRaw.getOrPut(ConvertableName("Commons")) { ArrayList() }
 
         var crudNames = crudsRaw.keys.sortedByDescending { it.value.length }
         for (apiModel in endpointAggregate.apiModels) {
