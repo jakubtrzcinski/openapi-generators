@@ -6,5 +6,6 @@ data class Endpoint(
     val name: ConvertableName,
     val method: String,
     val params: List<Param>,
-    val responseType: Type
+    val responseType: Type,
+    val group: ConvertableName? = null
 )

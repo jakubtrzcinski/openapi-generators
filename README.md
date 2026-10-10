@@ -51,6 +51,16 @@ $ ./oasgen.sh gen https://petstore.swagger.io/v2/swagger.json packages/shared/li
 ```
 
 ## Examples
+
+### Explicit client grouping
+
+By default, operations are grouped by the first URL segment. An operation may
+set `x-oasgen-group: region` to select its generated client group without changing
+the request URL. Group identifiers accept letters, digits, `_` and `-`, and must
+start with a letter or `_`. Existing operations without the extension retain
+their current grouping. This avoids creating an overly broad group such as `Me`
+for `/me/region`, which would otherwise also attract models named `Measurement`.
+
 All following examples are generated from https://petstore.swagger.io/ with unmodified templates
 
 ### Dart Retrofit

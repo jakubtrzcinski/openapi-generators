@@ -71,7 +71,7 @@ class CRUDAggregator {
     private fun getCruds(endpointAggregate: EndpointAggregate): Map<ConvertableName, ArrayList<Endpoint>> {
         val cruds = HashMap<ConvertableName, ArrayList<Endpoint>>()
         endpointAggregate.endpoints.forEach {
-            val crud = convertableNameFromUrl(it.path)
+            val crud = it.group ?: convertableNameFromUrl(it.path)
             if (!cruds.containsKey(crud)) {
                 cruds[crud] = ArrayList()
             }

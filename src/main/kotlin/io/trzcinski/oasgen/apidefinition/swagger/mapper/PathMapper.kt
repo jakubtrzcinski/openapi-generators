@@ -55,8 +55,17 @@ class PathMapper(
             ConvertableName(name),
             method,
             params,
-            getResponseType(item)
+            getResponseType(item),
+            getGroup(item)
         )
+    }
+
+    private fun getGroup(operation: Operation): ConvertableName? {
+        val value = operation.extensions?.get("x-oasgen-group") ?: return null
+        require(value is String && value.matches(Regex("[A-Za-z_][A-Za-z0-9_-]*"))) {
+            "x-oasgen-group must be a non-empty identifier for ${operation.operationId}"
+        }
+        return ConvertableName(value)
     }
 
     private fun getBodyType(operation: Operation): Type? {
