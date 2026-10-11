@@ -1,0 +1,61 @@
+openapi: 3.0.3
+info:
+  title: Stable operation groups
+  version: '1'
+servers:
+  - url: http://localhost
+paths:
+  /status:
+    get:
+      x-oasgen-group: commons
+      operationId: getStatus
+      responses:
+        '204':
+          description: Status
+  /items:
+    get:
+      operationId: getItems
+      responses:
+        '200':
+          description: Existing response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Measurement'
+  /me/region:
+    get:
+      x-oasgen-group: region
+      operationId: getUserRegion
+      responses:
+        '200':
+          description: Region
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegion'
+components:
+  schemas:
+    Measurement:
+      type: object
+      properties:
+        value: {type: string}
+    WeightMeasurement:
+      type: object
+      properties:
+        value: {type: string}
+    MeasurementDietSnapshot:
+      type: object
+      properties:
+        value: {type: string}
+    DietProductNutrientMetadata:
+      type: object
+      properties:
+        value: {type: string}
+    SocialMergeRequest:
+      type: object
+      properties:
+        value: {type: string}
+    UserRegion:
+      type: object
+      properties:
+        countryCode: {type: string}
