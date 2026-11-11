@@ -2,6 +2,7 @@ package io.trzcinski.oasgen.apidefinition.swagger.mapper
 
 import io.swagger.v3.oas.models.Operation
 import io.swagger.v3.oas.models.PathItem
+import io.swagger.v3.oas.models.media.ArraySchema
 import io.swagger.v3.oas.models.parameters.Parameter
 import io.trzcinski.oasgen.apidefinition.dto.ConvertableName
 import io.trzcinski.oasgen.apidefinition.dto.Endpoint
@@ -41,6 +42,17 @@ class PathMapper(
                 )
             }.toMutableList()
 
+        val multipartSchema = item.requestBody?.content?.get("multipart/form-data")?.schema
+        multipartSchema?.properties?.forEach { (fieldName, fieldSchema) ->
+            val optional = item.requestBody.required != true || !multipartSchema.required.orEmpty().contains(fieldName)
+            val fileSchema = (fieldSchema as? ArraySchema)?.items ?: fieldSchema
+            val type = if (fileSchema.type == "string" && fileSchema.format == "binary") {
+                Type(ConvertableName("MultipartFile"), optional, fieldSchema.type == "array")
+            } else {
+                dtoMapper.getType(fieldSchema, optional)
+            }
+            params.add(Param("multipart", ConvertableName(fieldName), fieldName, type))
+        }
         val req = getBodyType(item)
         if (req != null) {
             params.add(0, Param("body", ConvertableName("payload"), "payload", req))
@@ -56,7 +68,8 @@ class PathMapper(
             method,
             params,
             getResponseType(item),
-            getGroup(item)
+            getGroup(item),
+            multipartSchema != null
         )
     }
 
@@ -88,7 +101,12 @@ class PathMapper(
                 ?: operation.responses["201"]
                 ?: operation.responses["default"]
                 ?: return Type(ConvertableName("Void"), false, false)
-            val schema = responses.content["*/*"]?.schema ?: responses.content["application/json"]?.schema
+            val content = responses.content ?: return Type(ConvertableName("Void"), false, false)
+            val schema = content["*/*"]?.schema ?: content["application/json"]?.schema
+                ?: content.values.firstOrNull { it.schema?.type == "string" && it.schema?.format == "binary" }?.schema
+            if (schema?.type == "string" && schema.format == "binary") {
+                return Type(ConvertableName("Binary"), false, false)
+            }
 
             return dtoMapper.getType(schema, false)
 
